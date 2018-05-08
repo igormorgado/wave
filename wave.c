@@ -6,9 +6,9 @@
 
 #include "tic.h"
 
+#include "simulation.h"
 #include "ricker.h"
 #include "velocity_model.h"
-#include "simulation.h"
 
 void print_usage() {
     fprintf(stderr, "ERROR EXITING\n");
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
                                     // Maybe instead add a velocity model
                                     // as input data from stdin
 
-    double frequ = 25;              // Ricker source frequency
+    double freq = 25;              // Ricker source frequency
     double delay = 0.;              // Ricker source start delay
     size_t sx = nx/2 + 1;           // Ricker source position x
     size_t sz = nz/2 + 1;           // Ricker source position z
@@ -60,18 +60,18 @@ int main(int argc, char *argv[])
     /* Create structures and initialize structure
      * (data is created after parameters are processed)
      */
-    velocity_model *model = velocity_model__create(nx, nz, dx.  dz);
+    velocity_model *model = velocity_model__create(nx, nz, dx, dz);
 
-    ricker_wavelet *rickerw = ricker__create(freq);
-    ricker_source  *source  = ricker__model(*rickerw, sx, sz, delay); //model is awful name
+    ricker_wavelet *wavelet = ricker__create(freq);
+    ricker_source  *source  = ricker__model(wavelet, sx, sz, delay); //model is awful name
 
     simulation_params simulation;
     simulation.time = t;
     simulation.sample = sample;
 
     int opt = 0;
-    int long_index =0;
-    while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:h", long_options, long_index)) != -1)
+    int long_index = 0;
+    while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:h", long_options, &long_index)) != -1)
     {
         switch(opt) {
             case 't':
@@ -121,13 +121,13 @@ int main(int argc, char *argv[])
      */
 
     // Generate constant velocity model
-    velocity_model__constant_cube(*model, vel);
+    velocity_model__constant_cube(model, vel);
 
-    simulation.dt = stable_dt(*model, *source);    
-    simulation.steps = simulation.t / simulation.dt + 1;
+    simulation.dt = stable_dt(model, source);    
+    simulation.steps = simulation.time / simulation.dt + 1;
 
     // HERE I CAN CREATE RICKER TRACE
-    ricker__create_trace_from_simulation(*source, simulation)
+    ricker__create_trace_from_simulation(wavelet, simulation);
     
     // // HERE EVERYHING IS CREATE SIMULATION IS OK TO START
     // 
@@ -245,7 +245,6 @@ int main(int argc, char *argv[])
     //             fwrite(P1[iz], sizeof(double), nx, stdout);
     //     }
     // }
-
 
     ricker__destroy_source(source);
     velocity_model__destroy(model);

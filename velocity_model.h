@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+#include "simulation.h"
+#include "ricker.h"
+
 typedef struct velocity_model 
 {
     size_t  nx;                 /* Number of X cells / columns */
@@ -17,5 +20,7 @@ typedef struct velocity_model
 velocity_model * velocity_model__create(size_t nx, size_t nz, double dx, double dz);
 
 void  velocity_model__constant_cube(velocity_model *vm, double velocity);
+
+void velocity_model__destroy(velocity_model *model);
 
 #endif

@@ -12,6 +12,7 @@ ricker_wavelet *ricker__create(double frequency)
     return rw;
 }
 
+// MISSING RICKER_MODEL
 
 void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 {
