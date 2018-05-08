@@ -9,8 +9,18 @@
 #include "simulation.h"
 #include "velocity_model.h"
 #include "ricker.h"
+#include "wavefield.h"
 
-void print_usage(const char command[]) {
+/*
+ * TODO:
+ * 
+ */
+
+void print_tryhelp(const char command[]) {
+    fprintf(stderr, "Try %s -help for more info\n", command);
+}
+
+void print_help(const char command[]) {
     fprintf(stderr, "%s: Simulate a 2d wave equation over a velocity field.\n\n", command);
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "\t%s [PARAMETERS] > OUTPUT.bin\n\n", command);
@@ -37,7 +47,7 @@ int main(int argc, char *argv[])
 {
 
     /* Default values */
-    double t = 1.;                  // Simulation time
+    double time = 1.;               // Simulation time
     double sample = 0.008;          // Sampling rate to save
 
     size_t nx = 500;                // Model grid size X axis
@@ -55,7 +65,6 @@ int main(int argc, char *argv[])
     size_t sz = nz/2 + 1;           // Ricker source position z
 
     int verbose = 0;                // != 0  -> verbose
-
 
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
@@ -83,13 +92,8 @@ int main(int argc, char *argv[])
     ricker_source  *source  = ricker__model(wavelet, sx, sz, delay); //model is awful name
 
     simulation_params simulation;
-    simulation.time = t;
+    simulation.time = time;
     simulation.sample = sample;
-
-    // if(argc == 1) {
-    //     print_usage(argv[0]);
-    //     exit(EXIT_FAILURE);
-    // }
 
     int opt = 0;
     int long_index = 0;
@@ -130,19 +134,33 @@ int main(int argc, char *argv[])
                 verbose = 1;
                 break;
             case 'h':
-                print_usage(argv[0]);
+                print_help(argv[0]);
                 exit(EXIT_FAILURE);
             default:
-                print_usage(argv[0]);
+                print_tryhelp(argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
 
-    if(isatty(fileno(stdout))) {
-        fprintf(stderr, "STDOUT must be a 'pipe' or 'file'. If unsure use %s -help\n",argv[0]);
-        exit(1);
+    if(verbose) {
+        fprintf(stderr,"Command line parameters\n");
+        fprintf(stderr,"%7s: %lf\n", "time", simulation.time);
+        fprintf(stderr,"%7s: %lf\n", "sample", simulation.sample);
+        fprintf(stderr,"%7s: %u\n", "nx", model->nx);
+        fprintf(stderr,"%7s: %u\n", "nz", model->nz);
+        fprintf(stderr,"%7s: %lf\n", "dx", model->dx);
+        fprintf(stderr,"%7s: %lf\n", "dz", model->dz);
+        fprintf(stderr,"%7s: %lf\n", "vel", vel);
+        fprintf(stderr,"%7s: %lf\n", "freq", wavelet->frequency);
+        fprintf(stderr,"%7s: %lf\n", "sx", source->sx);
+        fprintf(stderr,"%7s: %lf\n", "sz", source->sz);
     }
 
+    if(isatty(fileno(stdout))) {
+        fprintf(stderr, "STDOUT must be a 'pipe' or 'file'.");
+        print_tryhelp(argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
     /* Now all parameters are correctly set, we can create
      * the data inside the structures and check for stability
@@ -156,10 +174,12 @@ int main(int argc, char *argv[])
 
     // HERE I CAN CREATE RICKER TRACE
     ricker__create_trace(wavelet, simulation.time, simulation.dt);
-    
 
-    for(int i=0; i< simulation.steps; i++)
-        fprintf(stderr, "%20.17lf\n", source->wavelet->trace[i]);
+    if(verbose) 
+        for(size_t i=0; i< 20 ; i++)
+            fprintf(stderr, "WAVELET(%5d) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
+
+
 
     // // HERE EVERYHING IS CREATE SIMULATION IS OK TO START
     //
@@ -178,15 +198,11 @@ int main(int argc, char *argv[])
     // //     fprintf(stderr, "\n");
     // // }
 
-
-
-
     // // Mathematical parameters;
     // double lapx;
     // double lapz;
 
     // /* 2nd order derivative in space (already applied spatial squares)
-    // double coef2[] = { -2, 1 };
     // double dxcoef2[2];
     // double dzcoef2[2];
     // for( int i=0; i< 2; i++)  {
@@ -197,7 +213,6 @@ int main(int argc, char *argv[])
 
     // /* 4th order derivative  in space  (already applied spatial squares)
     //  * should not be 4ths instead squares?
-    // double coef4[] = { -5/2, 4/3, -1/12 };
     // double dxcoef4[3];
     // double dzcoef4[3];
     // for( int i=0; i< 3; i++)  {
