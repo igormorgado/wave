@@ -10,17 +10,52 @@
 #include "velocity_model.h"
 #include "ricker.h"
 
-void print_usage() {
-    fprintf(stderr, "ERROR EXITING\n");
+void print_usage(const char command[]) {
+    fprintf(stderr, "%s: Simulate a 2d wave equation over a velocity field.\n\n", command);
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "\t%s [PARAMETERS] > OUTPUT.bin\n\n", command);
+    fprintf(stderr, "*** Redirection to a output file or a pipe is mandatory. ***\n");
+    fprintf(stderr, "\nGeneral Parameters:\n\n");
+    fprintf(stderr, "%-18s %s\n", "-help",            "This help");
+    fprintf(stderr, "%-18s %s\n", "-verbose",         "Verbose mode. Default: False");
+    fprintf(stderr, "\nSimulation Parameters:\n\n");
+    fprintf(stderr, "%-18s %s\n", "-time   <double>", "Simulation time in seconds. Default: 1s");
+    fprintf(stderr, "%-18s %s\n", "-sample <double>", "Sampling frequency to output. Default 0.008s");
+    fprintf(stderr, "\nWavelet Parameters:\n\n");
+    fprintf(stderr, "%-18s %s\n", "-freq <double>",   "Ricker wavelet frequency in Hz. Default: 25Hz");
+    fprintf(stderr, "\nModel Parameters:\n\n");
+    fprintf(stderr, "%-18s %s\n", "-nx <int>",        "Number of cells in X axis. Default: 500");
+    fprintf(stderr, "%-18s %s\n", "-nz <int>",        "Number of cells in Z axis. Default: 500");
+    fprintf(stderr, "%-18s %s\n", "-dx <double>",     "Size of cells in X direction in meters. Default: 1");
+    fprintf(stderr, "%-18s %s\n", "-dz <double>",     "Size of cells in Z direction in meters. Default: 1");
+    fprintf(stderr, "\nSource Parameters:\n\n");
+    fprintf(stderr, "%-18s %s\n", "-sx <int>",        "Source position in Grid X Component in units. Default: nx/2");
+    fprintf(stderr, "%-18s %s\n", "-sz <int>",        "Source position in Grid Z Component in units. Default: nz/2");
 }
 
 int main(int argc, char *argv[])
 {
 
-    if(isatty(fileno(stdout))) {
-        fprintf(stderr, "STDOUT must be a 'pipe' or 'file'\n");
-        exit(1);
-    }
+    /* Default values */
+    double t = 1.;                  // Simulation time
+    double sample = 0.008;          // Sampling rate to save
+
+    size_t nx = 500;                // Model grid size X axis
+    size_t nz = 500;                // Model grid size Z axis
+    double dx = 1.;                 // Model cell size X
+    double dz = 1.;                 // Model cell size Z
+    double vel = 1500.;             // Default constant velocity
+                                    // Maybe instead add a velocity model
+                                    // as input data from stdin
+
+    double freq = 25;               // Ricker wavelet frequency
+
+    double delay = 0.;              // Ricker source start delay
+    size_t sx = nx/2 + 1;           // Ricker source position x
+    size_t sz = nz/2 + 1;           // Ricker source position z
+
+    int verbose = 0;                // != 0  -> verbose
+
 
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
@@ -38,27 +73,9 @@ int main(int argc, char *argv[])
         {0,         0,                  0,  0  }
     };
 
-    /* Default values */
-    double t = 1.;                  // Simulation time
-    double sample = 0.008;          // Sampling rate to save
-
-    size_t nx = 1000;               // Model grid size X axis
-    size_t nz = 700;                // Model grid size Z axis
-    double dx = 1.;                 // Model cell size X
-    double dz = 1.;                 // Model cell size Z
-    double vel = 1500.;             // Default constant velocity
-                                    // Maybe instead add a velocity model
-                                    // as input data from stdin
-
-    double freq = 25;              // Ricker source frequency
-    double delay = 0.;              // Ricker source start delay
-    size_t sx = nx/2 + 1;           // Ricker source position x
-    size_t sz = nz/2 + 1;           // Ricker source position z
-
-    int verbose = 0;                // != 0  -> verbose
-
-    /* Create structures and initialize structure
-     * (data is created after parameters are processed)
+    /* 
+     * Create and initialize structures
+     * (data is created after, since we need correctly malloc)
      */
     velocity_model *model = velocity_model__create(nx, nz, dx, dz);
 
@@ -68,6 +85,11 @@ int main(int argc, char *argv[])
     simulation_params simulation;
     simulation.time = t;
     simulation.sample = sample;
+
+    // if(argc == 1) {
+    //     print_usage(argv[0]);
+    //     exit(EXIT_FAILURE);
+    // }
 
     int opt = 0;
     int long_index = 0;
@@ -108,13 +130,19 @@ int main(int argc, char *argv[])
                 verbose = 1;
                 break;
             case 'h':
-                print_usage();
+                print_usage(argv[0]);
                 exit(EXIT_FAILURE);
             default:
-                print_usage();
+                print_usage(argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
+
+    if(isatty(fileno(stdout))) {
+        fprintf(stderr, "STDOUT must be a 'pipe' or 'file'. If unsure use %s -help\n",argv[0]);
+        exit(1);
+    }
+
 
     /* Now all parameters are correctly set, we can create
      * the data inside the structures and check for stability
