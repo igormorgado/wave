@@ -10,7 +10,7 @@ ricker_wavelet *ricker__create(double frequency)
     wavelet->period = ricker__period(frequency);
     wavelet->shift = 0.;
 
-    return rw;
+    return wavelet;
 }
 
 ricker_source *ricker__model(ricker_wavelet *wavelet, size_t sx, size_t sz, double delay)
