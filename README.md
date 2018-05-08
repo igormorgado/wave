@@ -17,4 +17,22 @@ $ git clone https://github.com/igormorgado/wave
 ```
 $ cd wave
 # make wave
+```
+
+
+RECOMENDATIONS
+==============
+
+Is good to install seismic unix for visualization tool
+
+
+HOW TO USE
+==========
+
+**d2f**: convert binary double data to binary float data (necessary to use seismic unix visualization tools
+
+**bfdiff**: calculate the difference between two binary float files 
+
+
+For more infor check command helps.
 
