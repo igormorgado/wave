@@ -3,9 +3,7 @@
 
 #include <stdlib.h>
 
-// FORWARD Defnition
-struct simulation_params;
-typedef struct simulation_params simulation_params;
+#include "simulation.h"
 
 /* A ricker_wavelet, is a pure wavelet without any relationship with
  * a model or simulation. It stores only information about the wavelet.
