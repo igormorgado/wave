@@ -1,7 +1,7 @@
 #include <math.h>
 
 #include "ricker.h"
-#include "simulation.h"
+// #include "simulation.h"
 
 ricker_wavelet *ricker__create(double frequency)
 {
@@ -40,10 +40,12 @@ void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 }
 
 
-void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params *simulation)
-{
-    ricker__create_trace(wavelet, simulation->time, simulation->dt);
-}
+// FIXME: Using this function breaks compilation, since it has a self-refering
+// function between  ricker and simulation.
+// void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params *simulation)
+// {
+//     ricker__create_trace(wavelet, simulation->time, simulation->dt);
+// }
 
 
 void ricker__destroy(ricker_wavelet *wavelet)

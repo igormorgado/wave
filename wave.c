@@ -127,7 +127,11 @@ int main(int argc, char *argv[])
     simulation.steps = simulation.time / simulation.dt + 1;
 
     // HERE I CAN CREATE RICKER TRACE
-    ricker__create_trace_from_simulation(wavelet, &simulation);
+    ricker__create_trace(wavelet, simulation.time, simulation.dt);
+    
+
+    for(int i=0; i< simulation.steps; i++)
+        fprintf(stderr, "%20.17lf\n", source->wavelet->trace[i]);
 
     // // HERE EVERYHING IS CREATE SIMULATION IS OK TO START
     //
@@ -249,9 +253,9 @@ int main(int argc, char *argv[])
     ricker__destroy_source(source);
     velocity_model__destroy(model);
 
-    fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
-    fprintf(stderr, "TOTAL ");
-    tic();
+    // fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
+    // fprintf(stderr, "TOTAL ");
+    // tic();
 
     fflush(stdout);
     fflush(stderr);

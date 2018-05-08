@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "simulation.h"
+// #include "simulation.h"
 
 /* A ricker_wavelet, is a pure wavelet without any relationship with
  * a model or simulation. It stores only information about the wavelet.
@@ -32,7 +32,7 @@ ricker_wavelet *ricker__create(double frequency);
 
 ricker_source  *ricker__model(ricker_wavelet *wavelet, size_t sx, size_t sz, double delay);
 
-void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params *simulation);
+// void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params simulation);
 
 void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt);
 
