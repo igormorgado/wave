@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "STDOUT must be a 'pipe' or 'file'\n");
         exit(1);
     }
-    
+
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
         {"sample",  required_argument,  0,  'd'},   // Wave simulation sampling
@@ -123,14 +123,14 @@ int main(int argc, char *argv[])
     // Generate constant velocity model
     velocity_model__constant_cube(model, vel);
 
-    simulation.dt = stable_dt(model, source);    
+    simulation.dt = stable_dt(model, source);
     simulation.steps = simulation.time / simulation.dt + 1;
 
     // HERE I CAN CREATE RICKER TRACE
-    ricker__create_trace_from_simulation(wavelet, simulation);
-    
+    ricker__create_trace_from_simulation(wavelet, &simulation);
+
     // // HERE EVERYHING IS CREATE SIMULATION IS OK TO START
-    // 
+    //
     // // Allocate wavefield: MAYBE THIS GO TO SIMULATION LATER
     // double *P1[nz], *P2[nz], *Pt[nz];
     // for(int i = 0; i < nz; i++) {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
     // // Iterate over timesteps THIS SHOULD GO SOMEWHERE ELSE
     // vel = powf(vel * dt, 2);
 
-    // int ntrec = dtrec/dt; 
+    // int ntrec = dtrec/dt;
 
     // for(int it = 0; it < simulation.steps; it++) {
     //     simulation__inject_source(*wavefield, *model, *source, it); // Right now only one source
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
     //     // Ricker should be multiplied by velocity in spatial position
     //     P1[sz][sx] -= vel*ricker_wave[it];
     //     //fprintf(stderr, "%010d Injected %lf\n", it, P1[sx][sz]);
-    //     
+    //
     //     // 8th order in space
     //     // for(int iz=3; iz < nz-3; iz++) {
     //     //     for(int ix=3; ix < nx-3; ix++) {
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
     //     //         P1[iz][ix] = 2*P2[iz][ix] - P1[iz][ix] + vel * (lapx + lapz);
     //     //     }
     //     // }
-    //     
+    //
     //     // 4th order in space
     //     // for(int iz=2; iz < nz-2; iz++) {
     //     //     for(int ix=2; ix < nx-2; ix++) {
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
     //     if( it % ntrec == 0) {
     //         fprintf(stderr, "Iteration step: %d/%d -- ", it,steps);
     //         tic();
-    //         for(int iz=0; iz<nz; iz++) 
+    //         for(int iz=0; iz<nz; iz++)
     //             fwrite(P1[iz], sizeof(double), nx, stdout);
     //     }
     // }

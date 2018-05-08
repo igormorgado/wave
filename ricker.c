@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include "ricker.h"
+#include "simulation.h"
 
 ricker_wavelet *ricker__create(double frequency)
 {
@@ -39,9 +40,9 @@ void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 }
 
 
-void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params simulation)
+void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params *simulation)
 {
-    ricker__create_trace(wavelet, simulation.time, simulation.dt);
+    ricker__create_trace(wavelet, simulation->time, simulation->dt);
 }
 
 
@@ -70,7 +71,7 @@ double ricker__points(double t, double f, double s)
      * For a *zero* phase set s to 0
      * For a *minimum* phase set s to -period
      */
-    
+
     double p = powf(M_PI * f * (t+s), 2);
     return ( 1 - 2*p ) * exp(-p);
 }
