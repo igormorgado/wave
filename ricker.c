@@ -1,18 +1,29 @@
 #include <math.h>
+
 #include "ricker.h"
 
 ricker_wavelet *ricker__create(double frequency)
 {
     /* Return a ricker_wavelet structure without any traces */
-    ricker_wavelet *rw = malloc(sizeof (ricker_wavelet));
-    rw->frequency = frequency;
-    rw->period = ricker__period(frequency);
-    rw->shift = 0.;
+    ricker_wavelet *wavelet = malloc(sizeof (ricker_wavelet));
+    wavelet->frequency = frequency;
+    wavelet->period = ricker__period(frequency);
+    wavelet->shift = 0.;
 
     return rw;
 }
 
-// MISSING RICKER_MODEL
+ricker_source *ricker__model(ricker_wavelet *wavelet, size_t sx, size_t sz, double delay)
+{
+    ricker_source *source = malloc(sizeof (ricker_source));
+    source->sx = sx;
+    source->sz = sz;
+    source->delay = delay;
+    source->wavelet = wavelet;
+
+    return source;
+}
+
 
 void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 {

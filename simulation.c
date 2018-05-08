@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include "simulation.h"
-#include "ricker.h"
 
 double stable_dt(velocity_model *model, ricker_source *source) 
 {

@@ -7,8 +7,8 @@
 #include "tic.h"
 
 #include "simulation.h"
-#include "ricker.h"
 #include "velocity_model.h"
+#include "ricker.h"
 
 void print_usage() {
     fprintf(stderr, "ERROR EXITING\n");

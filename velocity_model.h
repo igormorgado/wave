@@ -3,8 +3,8 @@
 
 #include <stdlib.h>
 
-#include "simulation.h"
-#include "ricker.h"
+// #include "simulation.h"
+// #include "ricker.h"
 
 typedef struct velocity_model 
 {
