@@ -11,6 +11,7 @@
 
 #include "ricker.h"
 #include "velocity_model.h"
+#include "wavefield.h"
 
 typedef uint8_t SIMUL_STATUS;
 
@@ -29,5 +30,7 @@ typedef struct simulation_params
 double stable_dt(velocity_model *model, ricker_source *source);
 
 SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_params *simul);
+
+void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, size_t it);
 
 #endif

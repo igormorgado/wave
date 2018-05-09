@@ -4,12 +4,15 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#include "globals.h"
+
+#include "utils.h"
 #include "tic.h"
 
-#include "simulation.h"
 #include "velocity_model.h"
 #include "ricker.h"
 #include "wavefield.h"
+#include "simulation.h"
 
 /*
  * TODO:
@@ -28,6 +31,7 @@ void print_help(const char command[]) {
     fprintf(stderr, "\nGeneral Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-help",            "This help");
     fprintf(stderr, "%-18s %s\n", "-verbose",         "Verbose mode. Default: False");
+    fprintf(stderr, "%-18s %s\n", "-tic",             "Show processing step timings. Default: True");
     fprintf(stderr, "\nSimulation Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-time   <double>", "Simulation time in seconds. Default: 1s");
     fprintf(stderr, "%-18s %s\n", "-sample <double>", "Sampling frequency to output. Default 0.008s");
@@ -64,7 +68,8 @@ int main(int argc, char *argv[])
     size_t sx = nx/2 + 1;           // Ricker source position x
     size_t sz = nz/2 + 1;           // Ricker source position z
 
-    int verbose = 0;                // != 0  -> verbose
+    int verbose = 0;
+    int ticprt = 0;
 
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
@@ -77,6 +82,7 @@ int main(int argc, char *argv[])
         {"sx",      required_argument,  0,  'w'},   // Source X position
         {"sz",      required_argument,  0,  'q'},   // Source Y position
         {"vel",     required_argument,  0,  'v'},   // Media constant velocity
+        {"tic",     required_argument,  0,  'i'},   // Show tic steps
         {"verbose", no_argument,        0,  'V'},   // verbose mode / with debug
         {"help",    no_argument,        0,  'h'},   // Call for help
         {0,         0,                  0,  0  }
@@ -110,10 +116,10 @@ int main(int argc, char *argv[])
                 source->wavelet->frequency = atof(optarg);
                 break;
             case 'w':
-                source->sx = atoi(optarg);
+                source->x = atoi(optarg);
                 break;
             case 'q':
-                source->sz = atoi(optarg);
+                source->z = atoi(optarg);
                 break;
             case 'x':
                 model->nx = atoi(optarg);
@@ -132,6 +138,9 @@ int main(int argc, char *argv[])
                 break;
             case 'V':
                 verbose = 1;
+                break;
+            case 'i':
+                ticprt = 1;
                 break;
             case 'h':
                 print_help(argv[0]);
@@ -152,8 +161,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"%7s: %lf\n", "dz", model->dz);
         fprintf(stderr,"%7s: %lf\n", "vel", vel);
         fprintf(stderr,"%7s: %lf\n", "freq", wavelet->frequency);
-        fprintf(stderr,"%7s: %lf\n", "sx", source->sx);
-        fprintf(stderr,"%7s: %lf\n", "sz", source->sz);
+        fprintf(stderr,"%7s: %lf\n", "sx", source->x);
+        fprintf(stderr,"%7s: %lf\n", "sz", source->z);
     }
 
     if(isatty(fileno(stdout))) {
@@ -172,83 +181,23 @@ int main(int argc, char *argv[])
     simulation.dt = stable_dt(model, source);
     simulation.steps = simulation.time / simulation.dt + 1;
 
-    // HERE I CAN CREATE RICKER TRACE
     ricker__create_trace(wavelet, simulation.time, simulation.dt);
+
+    wavefield *P = wavefield__create(model->nx, model->nz);
 
     if(verbose) 
         for(size_t i=0; i< 20 ; i++)
             fprintf(stderr, "WAVELET(%5d) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
 
+    for(int it = 0; it < simulation.steps; it++) {
 
-
-    // // HERE EVERYHING IS CREATE SIMULATION IS OK TO START
-    //
-    // // Allocate wavefield: MAYBE THIS GO TO SIMULATION LATER
-    // double *P1[nz], *P2[nz], *Pt[nz];
-    // for(int i = 0; i < nz; i++) {
-    //     P1[i] = calloc( nx, sizeof **P1);
-    //     P2[i] = calloc( nx, sizeof **P2);
-    //     Pt[i] = calloc( nx, sizeof **Pt);
-    // }
-
-    // // Wave field debug
-    // // for(int i = 0; i < nz; i++) {
-    // //     for(int j = 0; j < nx; j++)
-    // //         fprintf(stderr, "%2.1f ", P1[i][j]);
-    // //     fprintf(stderr, "\n");
-    // // }
-
-    // // Mathematical parameters;
-    // double lapx;
-    // double lapz;
-
-    // /* 2nd order derivative in space (already applied spatial squares)
-    // double dxcoef2[2];
-    // double dzcoef2[2];
-    // for( int i=0; i< 2; i++)  {
-    //     dxcoef2[i] = coef2[i]/(dx*dx);
-    //     dzcoef2[i] = coef2[i]/(dz*dz);
-    // }
-    // */
-
-    // /* 4th order derivative  in space  (already applied spatial squares)
-    //  * should not be 4ths instead squares?
-    // double dxcoef4[3];
-    // double dzcoef4[3];
-    // for( int i=0; i< 3; i++)  {
-    //     dxcoef4[i] = coef4[i]/(dx*dx);
-    //     dzcoef4[i] = coef4[i]/(dz*dz);
-    // }
-    // */
-
-    // /* 8th  order derivative in space (already applied spatial squares)
-    //  * should not be 8ths instead squares?
-    // double coef8[] = { -49/18, 3/2, -3/20, 1/90 };
-    // double dxcoef8[4];
-    // double dzcoef8[4];
-    // for( int i=0; i< 4; i++)  {
-    //     dxcoef8[i] = coef8[i]/(dx*dx);
-    //     dzcoef8[i] = coef8[i]/(dz*dz);
-    // }
-    // */
-
-    // // Iterate over timesteps THIS SHOULD GO SOMEWHERE ELSE
-    // vel = powf(vel * dt, 2);
-
-    // int ntrec = dtrec/dt;
-
-    // for(int it = 0; it < simulation.steps; it++) {
-    //     simulation__inject_source(*wavefield, *model, *source, it); // Right now only one source
+        simulation__inject_source(P, model, source, it);
     //     simulation__laplacian(*wavefield, *model);
     //     simulation__perfect_match_layer(*wavefield, *model);
     //     simulation__swap(wavefield, wavefield_t);
     //     simulation__save_step(wavefield);   // Only saves if matches sampling rate
     // }
 
-    //     // Ricker should be multiplied by velocity in spatial position
-    //     P1[sz][sx] -= vel*ricker_wave[it];
-    //     //fprintf(stderr, "%010d Injected %lf\n", it, P1[sx][sz]);
-    //
     //     // 8th order in space
     //     // for(int iz=3; iz < nz-3; iz++) {
     //     //     for(int ix=3; ix < nx-3; ix++) {
@@ -291,14 +240,19 @@ int main(int argc, char *argv[])
     //         for(int iz=0; iz<nz; iz++)
     //             fwrite(P1[iz], sizeof(double), nx, stdout);
     //     }
-    // }
+    }
 
+    wavefield__destroy(P);
     ricker__destroy_source(source);
     velocity_model__destroy(model);
 
-    // fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
-    // fprintf(stderr, "TOTAL ");
-    // tic();
+    if(verbose)
+        fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
+
+    if(ticprt) {
+        fprintf(stderr, "TOTAL ");
+        tic();
+    }
 
     fflush(stdout);
     fflush(stderr);

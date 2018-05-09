@@ -1,6 +1,6 @@
 LIBS = -lm
 CFLAGS = -Wall
-OBJS = tic ricker utils simulation velocity_model
+OBJS = global tic ricker utils simulation velocity_model
 UTILS = bfdiff d2f
 PROGS = wave 
 TESTS = test_tic test_ricker

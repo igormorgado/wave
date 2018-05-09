@@ -14,11 +14,11 @@ ricker_wavelet *ricker__create(double frequency)
     return wavelet;
 }
 
-ricker_source *ricker__model(ricker_wavelet *wavelet, size_t sx, size_t sz, double delay)
+ricker_source *ricker__model(ricker_wavelet *wavelet, size_t x, size_t z, double delay)
 {
     ricker_source *source = malloc(sizeof (ricker_source));
-    source->sx = sx;
-    source->sz = sz;
+    source->x = x;
+    source->z = z;
     source->delay = delay;
     source->wavelet = wavelet;
 

@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "globals.h"
 #include "simulation.h"
 
 double stable_dt(velocity_model *model, ricker_source *source) 
@@ -54,3 +55,14 @@ SIMUL_STATUS isstable(ricker_source *source,
     return simul_status;
 } 
 
+
+void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, size_t it)
+{
+    // Get position of injection in the flattened array
+    size_t pos = w->nx * s->z + s->x;
+
+    w->grid[pos] += m->cube[pos] * s->wavelet->trace[it];
+
+    if(verbose)
+        fprintf(stderr, "%010lu injected @ [%lu,%lu] %lf\n", it, w->nx, w->nz, s->wavelet->trace[it]);
+}
