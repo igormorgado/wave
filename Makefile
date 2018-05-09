@@ -1,6 +1,6 @@
 LIBS = -lm
 CFLAGS = -Wall
-OBJS = global tic ricker utils simulation velocity_model
+OBJS = tic ricker utils simulation velocity_model globals
 UTILS = bfdiff d2f
 PROGS = wave 
 TESTS = test_tic test_ricker
@@ -8,8 +8,8 @@ TESTS = test_tic test_ricker
 SRC=$(wildcard *.c)
 
 wave: $(OBJS) 
-	gcc -c wave.c $(CGLAGS) $(LIBS)
-	gcc -o wave wave.o ricker.o tic.o simulation.o velocity_model.o $(CGLAGS) $(LIBS)
+	gcc -c wave.c $(CGLAGS) 
+	gcc -o wave wave.o globals.o ricker.o tic.o simulation.o velocity_model.o $(CGLAGS) $(LIBS)
 
 all: $(OBJS) $(UTILS) $(PROGS)
 	@echo Pick $(PROGS)
@@ -23,20 +23,23 @@ tests: $(TESTS)
 
 objs: $(OBJS)
 
+globals:
+	gcc -c globals.c $(CFLAGS)
+
 ricker:
-	gcc -c ricker.c ${LIBS} ${CFLAGS}
+	gcc -c ricker.c $(CFLAGS)
 
 simulation:
-	gcc -c simulation.c ${LIBS} ${CFLAGS}
+	gcc -c simulation.c $(CFLAGS)
 
 velocity_model:
-	gcc -c velocity_model.c ${LIBS} ${CFLAGS}
+	gcc -c velocity_model.c $(CFLAGS)
 
 tic:
-	gcc -c tic.c $(LIBS} $(CFLAGS)
+	gcc -c tic.c $(CFLAGS)
 
 utils:
-	gcc -c utils.c $(LIBS) $(CFLAGS)
+	gcc -c utils.c $(CFLAGS)
 
 ##################################################
 ## TESTS

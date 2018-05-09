@@ -161,8 +161,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"%7s: %lf\n", "dz", model->dz);
         fprintf(stderr,"%7s: %lf\n", "vel", vel);
         fprintf(stderr,"%7s: %lf\n", "freq", wavelet->frequency);
-        fprintf(stderr,"%7s: %lf\n", "sx", source->x);
-        fprintf(stderr,"%7s: %lf\n", "sz", source->z);
+        fprintf(stderr,"%7s: %zu\n", "sx", source->x);
+        fprintf(stderr,"%7s: %zu\n", "sz", source->z);
     }
 
     if(isatty(fileno(stdout))) {

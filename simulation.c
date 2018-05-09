@@ -64,5 +64,5 @@ void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s
     w->grid[pos] += m->cube[pos] * s->wavelet->trace[it];
 
     if(verbose)
-        fprintf(stderr, "%010lu injected @ [%lu,%lu] %lf\n", it, w->nx, w->nz, s->wavelet->trace[it]);
+        fprintf(stderr, "%010zu injected @ [%zu,%zu] %lf\n", it, w->nx, w->nz, s->wavelet->trace[it]);
 }
