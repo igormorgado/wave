@@ -9,7 +9,6 @@
 #include "simulation.h"
 #include "velocity_model.h"
 #include "ricker.h"
-#include "wavefield.h"
 
 /*
  * TODO:
@@ -146,14 +145,14 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Command line parameters\n");
         fprintf(stderr,"%7s: %lf\n", "time", simulation.time);
         fprintf(stderr,"%7s: %lf\n", "sample", simulation.sample);
-        fprintf(stderr,"%7s: %u\n", "nx", model->nx);
-        fprintf(stderr,"%7s: %u\n", "nz", model->nz);
+        fprintf(stderr,"%7s: %zu\n", "nx", model->nx);
+        fprintf(stderr,"%7s: %zu\n", "nz", model->nz);
         fprintf(stderr,"%7s: %lf\n", "dx", model->dx);
         fprintf(stderr,"%7s: %lf\n", "dz", model->dz);
         fprintf(stderr,"%7s: %lf\n", "vel", vel);
         fprintf(stderr,"%7s: %lf\n", "freq", wavelet->frequency);
-        fprintf(stderr,"%7s: %lf\n", "sx", source->sx);
-        fprintf(stderr,"%7s: %lf\n", "sz", source->sz);
+        fprintf(stderr,"%7s: %zu\n", "sx", source->sx);
+        fprintf(stderr,"%7s: %zu\n", "sz", source->sz);
     }
 
     if(isatty(fileno(stdout))) {

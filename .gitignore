@@ -2,3 +2,4 @@ oldcodes/
 data/
 seismic.py
 *.o
+wave
