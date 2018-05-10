@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Command line parameters\n");
         fprintf(stderr,"%7s: %lf\n", "time", simulation.time);
         fprintf(stderr,"%7s: %lf\n", "sample", simulation.sample);
-        fprintf(stderr,"%7s: %u\n", "nx", model->nx);
-        fprintf(stderr,"%7s: %u\n", "nz", model->nz);
+        fprintf(stderr,"%7s: %zu\n", "nx", model->nx);
+        fprintf(stderr,"%7s: %zu\n", "nz", model->nz);
         fprintf(stderr,"%7s: %lf\n", "dx", model->dx);
         fprintf(stderr,"%7s: %lf\n", "dz", model->dz);
         fprintf(stderr,"%7s: %lf\n", "vel", vel);
@@ -187,9 +187,9 @@ int main(int argc, char *argv[])
 
     if(verbose) 
         for(size_t i=0; i< 20 ; i++)
-            fprintf(stderr, "WAVELET(%5d) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
+            fprintf(stderr, "WAVELET(%5zu) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
 
-    for(int it = 0; it < simulation.steps; it++) {
+    for(size_t it = 0; it < simulation.steps; it++) {
 
         simulation__inject_source(P, model, source, it);
     //     simulation__laplacian(*wavefield, *model);
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
     velocity_model__destroy(model);
 
     if(verbose)
-        fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
+        fprintf(stderr, "xmovie n1=%zu n2=%zu d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
 
     if(ticprt) {
         fprintf(stderr, "TOTAL ");

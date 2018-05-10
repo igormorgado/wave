@@ -6,8 +6,8 @@ wavefield * wavefield__create(size_t nx, size_t nz) {
     wavefield *w = malloc(sizeof (wavefield));
     w->nx = nx;
     w->nz = nz;
-    double w->grid   = calloc(nx * nz, sizeof (double));
-    double w->grid_o = calloc(nx * nz, sizeof (double));
+    w->grid   = calloc(nx * nz, sizeof (double));
+    w->grid_o = calloc(nx * nz, sizeof (double));
 
     return w;
 }

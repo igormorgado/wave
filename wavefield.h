@@ -22,6 +22,6 @@ typedef struct wavefield
 } wavefield;
 
 wavefield * wavefield__create(size_t nx, size_t nz);
-void * wavefield__destroy(wavefield *w);
+void wavefield__destroy(wavefield *w);
 
 #endif
