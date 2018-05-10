@@ -27,6 +27,7 @@ typedef struct simulation_params
     size_t steps;           /* Number of simulation steps */
 } simulation_params;
 
+
 double stable_dt(velocity_model *model, ricker_source *source);
 
 SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_params *simul);

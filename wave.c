@@ -151,7 +151,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(verbose) {
+    if(verbose)
+    {
         fprintf(stderr,"Command line parameters\n");
         fprintf(stderr,"%7s: %lf\n", "time", simulation.time);
         fprintf(stderr,"%7s: %lf\n", "sample", simulation.sample);
@@ -165,7 +166,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"%7s: %zu\n", "sz", source->z);
     }
 
-    if(isatty(fileno(stdout))) {
+    if(isatty(fileno(stdout)))
+    {
         fprintf(stderr, "STDOUT must be a 'pipe' or 'file'.");
         print_tryhelp(argv[0]);
         exit(EXIT_FAILURE);
@@ -189,11 +191,16 @@ int main(int argc, char *argv[])
         for(size_t i=0; i< 20 ; i++)
             fprintf(stderr, "WAVELET(%5zu) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
 
-    for(size_t it = 0; it < simulation.steps; it++) {
+    // DEBUG
+    // size_t POS = P->nx * source->z + source->x;
+    // fprintf(stderr, "Source at %zu,%zu flatenned %zu\n", source->x, source->z, POS);
+    // DEBUG
+    
+    for(size_t it = 0; it < simulation.steps; it++)
+    {
 
         simulation__inject_source(P, model, source, it);
-
-    //     simulation__laplacian(*wavefield, *model);
+        wavefield__laplacian4(P, model);
     //     simulation__perfect_match_layer(*wavefield, *model);
     //     simulation__swap(wavefield, wavefield_t);
     //     simulation__save_step(wavefield);   // Only saves if matches sampling rate

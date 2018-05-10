@@ -1,5 +1,5 @@
 LIBS = -lm
-CFLAGS = -Wall -g -ggdb
+CFLAGS = -Wall -g -ggdb 
 OBJS = tic ricker utils simulation velocity_model globals wavefield
 UTILS = bfdiff d2f
 PROGS = wave 
@@ -28,7 +28,7 @@ globals:
 	$(CC) -c globals.c $(CFLAGS)
 
 ricker:
-	$(CC) -c ricker.c $(CFLAGS)
+	$(CC) -c ricker.c $(CFLAGS) $(LIBS)
 
 simulation:
 	$(CC) -c simulation.c $(CFLAGS)

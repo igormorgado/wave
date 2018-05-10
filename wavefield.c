@@ -19,8 +19,14 @@ void wavefield__destroy(wavefield *w)
     free(w);
 }
 
+void wavefield__laplacian4(wavefield *wave, velocity_model *model)
+{
+    for (size_t i=0; i < len(cfd2nd_8th_order); i++) 
+        fprintf(stderr, "TAQP %zu %lf\n", i, cfd2nd_8th_order[i]);
 
-// functions
+    fprintf(stderr,"\n");
+}
+
 
 // 0. Iterate fourth order
 
@@ -34,20 +40,6 @@ void wavefield__destroy(wavefield *w)
 
     // int ntrec = dtrec/dt;
 
-    // // Allocate wavefield: MAYBE THIS GO TO SIMULATION LATER
-    // double *P1[nz], *P2[nz], *Pt[nz];
-    // for(int i = 0; i < nz; i++) {
-    //     P1[i] = calloc( nx, sizeof **P1);
-    //     P2[i] = calloc( nx, sizeof **P2);
-    //     Pt[i] = calloc( nx, sizeof **Pt);
-    // }
-
-    // // Wave field debug
-    // // for(int i = 0; i < nz; i++) {
-    // //     for(int j = 0; j < nx; j++)
-    // //         fprintf(stderr, "%2.1f ", P1[i][j]);
-    // //     fprintf(stderr, "\n");
-    // // }
 
     // // Mathematical parameters;
     // double lapx;
