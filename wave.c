@@ -192,6 +192,7 @@ int main(int argc, char *argv[])
     for(size_t it = 0; it < simulation.steps; it++) {
 
         simulation__inject_source(P, model, source, it);
+
     //     simulation__laplacian(*wavefield, *model);
     //     simulation__perfect_match_layer(*wavefield, *model);
     //     simulation__swap(wavefield, wavefield_t);
