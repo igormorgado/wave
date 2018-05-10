@@ -22,7 +22,7 @@ void wavefield__destroy(wavefield *w)
 void wavefield__laplacian4(wavefield *wave, velocity_model *model)
 {
     for (size_t i=0; i < len(cfd2nd_8th_order); i++) 
-        fprintf(stderr, "TAQP %zu %lf\n", i, cfd2nd_8th_order[i]);
+        fprintf(stderr, "%lf ", cfd2nd_8th_order[i]);
 
     fprintf(stderr,"\n");
 }
