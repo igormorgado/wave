@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     size_t sz = nz/2 + 1;           // Ricker source position z
 
     verbose = 0;
-    ticprt = 0;
+    ticprt = 1;
 
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
@@ -185,6 +185,13 @@ int main(int argc, char *argv[])
     simulation.dt = stable_dt(model, source);
     simulation.steps = simulation.time / simulation.dt + 1;
 
+    // Check stability before everything
+    if(isstable(source, model, &simulation) != SIMUL_OK)
+    {
+       fprintf(stderr, "Erro no modelo\n");
+       exit(EXIT_FAILURE);
+    }
+
     ricker__create_trace(wavelet, simulation.time, simulation.dt);
 
     wavefield *P = wavefield__create(model->nx, model->nz);
@@ -201,8 +208,8 @@ int main(int argc, char *argv[])
     for(size_t it = 0; it < simulation.steps; it++)
     {
 
-        simulation__inject_source(P, model, source, it);
-        wavefield__laplacian4(P, model, simulation.dt);
+        simulation__inject_source(P, model, source, &simulation, it);
+        wavefield__laplacian(P, model, simulation.dt);
     //  wavefield__perfect_match_layer(P, *model);
         wavefield__swap(P);
         simulation__write(it, P, &simulation, stdout);

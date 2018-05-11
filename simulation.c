@@ -57,15 +57,15 @@ SIMUL_STATUS isstable(ricker_source *source,
 } 
 
 
-void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, size_t it)
+void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, simulation_params *simul, size_t it)
 {
     // Get position of injection in the flattened array
     size_t pos = w->nx * s->z + s->x;
 
-    w->grid[pos] -= m->cube[pos] * s->wavelet->trace[it];
+    w->grid[pos] += powf(m->cube[pos] * simul->dt, 2) * s->wavelet->trace[it];
 
     if(verbose)
-        fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, w->nx, w->nz, pos, s->wavelet->trace[it]);
+        fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, s->x, s->z, pos, s->wavelet->trace[it]);
 }
 
 
@@ -76,11 +76,14 @@ void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd)
 
     if( it % ntrec == 0)  {
         fwrite(w->grid, sizeof(double), w->nx * w->nz, fd);
+
         if(verbose) 
-            fprintf(stderr, "Iteration step: %zu/%zu -- ", it, s->steps);
+            fprintf(stderr, "Iteration step: %zu/%zu ", it, s->steps);
 
         if(ticprt)
             tic();
+        else
+            fprintf(stderr, "\n");
         
     }
 }

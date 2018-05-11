@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
     int ntrec = dtrec/dt; 
 
     for(int it = 0; it < steps; it ++) {
+
+        // Inject the source
         P1[sz][sx] += vel*ricker_wave[it];
         
         for(int iz=2; iz < nz-2; iz++) {
