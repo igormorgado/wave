@@ -64,8 +64,9 @@ void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s
 
     w->grid[pos] += powf(m->cube[pos] * simul->dt, 2) * s->wavelet->trace[it];
 
-    if(verbose)
-        fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, s->x, s->z, pos, s->wavelet->trace[it]);
+    // DEBUG
+    // if(verbose)
+    //     fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, s->x, s->z, pos, s->wavelet->trace[it]);
 }
 
 
@@ -77,13 +78,11 @@ void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd)
     if( it % ntrec == 0)  {
         fwrite(w->grid, sizeof(double), w->nx * w->nz, fd);
 
-        if(verbose) 
-            fprintf(stderr, "Iteration step: %zu/%zu ", it, s->steps);
 
-        if(ticprt)
+        if(ticprt) {
+            fprintf(stderr, "Iteration step: %7zu/%7zu -- ", it, s->steps);
             tic();
-        else
-            fprintf(stderr, "\n");
+        }
         
     }
 }

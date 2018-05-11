@@ -33,7 +33,7 @@ void print_help(const char command[]) {
     fprintf(stderr, "%-18s %s\n", "-verbose",         "Verbose mode. Default: False");
     fprintf(stderr, "%-18s %s\n", "-tic",             "Show processing step timings. Default: True");
     fprintf(stderr, "\nSimulation Parameters:\n\n");
-    fprintf(stderr, "%-18s %s\n", "-time   <double>", "Simulation time in seconds. Default: 1s");
+    fprintf(stderr, "%-18s %s\n", "-time   <double>", "Simulation time in seconds. Default: .25s");
     fprintf(stderr, "%-18s %s\n", "-sample <double>", "Sampling frequency to output. Default 0.008s");
     fprintf(stderr, "\nWavelet Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-freq <double>",   "Ricker wavelet frequency in Hz. Default: 25Hz");

@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <time.h>
 
-
 double tic(void)
 {
     static clock_t time = 0;

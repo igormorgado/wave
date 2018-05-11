@@ -28,9 +28,9 @@ void wavefield__laplacian(wavefield *wave, velocity_model *model, double dt)
     // const double cfd2nd_6th_order[4] = { -49./18, 3./2, -3./20, 1./90 };
     // const double cfd2nd_8th_order[5] = { -205./72, 8./5, -1./5, 8./315, -1./560 };
 
+    //const double coef[] = { -205./72, 8./5, -1./5, 8./315, -1./560 };
     // 2nd Derivative - 4th order coefficients
-    //const double coef[] = { -5./2, 4./3, -1./12 };
-    const double coef[] = { -205./72, 8./5, -1./5, 8./315, -1./560 };
+    const double coef[] = { -5./2, 4./3, -1./12 };
     size_t coef_len = len(coef);
     size_t border_size = coef_len - 1;
 
@@ -80,16 +80,18 @@ void wavefield__laplacian(wavefield *wave, velocity_model *model, double dt)
             vel = powf(model->cube[pos] * dt , 2);
             wave->grid[pos] = 2*wave->grid_o[pos] - wave->grid[pos] + vel * (lapx + lapz);
 
-            if(pos == 125751)
-            {
-                int off = (coef_len-1)/2;
-                for(int i=-off; i <= off ; i++) {
-                    for(int j=-off; j <= off; j++) 
-                        fprintf(stderr, "(%6zu)%12.8lf ", pos + (i*model->nx) + j, wave->grid[pos+(i*model->nx) +j]);  
-                    fprintf(stderr,"\n");
-                }
-                fprintf(stderr, "lap_x %10lf lap_z %10lf vel_d2 %10lf vel %10lf\n\n", lapx, lapz, vel, model->cube[pos]);
-            }
+            // debug only. Remove later
+            // if(verbose && pos == 125751)
+            // {
+            //     int off = (coef_len-1)/2;
+            //     for(int i=-off; i <= off ; i++) {
+            //         for(int j=-off; j <= off; j++) 
+            //             fprintf(stderr, "(%6zu)%12.8lf ", pos + (i*model->nx) + j, wave->grid[pos+(i*model->nx) +j]);  
+            //         fprintf(stderr,"\n");
+            //     }
+            //     fprintf(stderr, "lap_x %.10lf lap_z %.10lf vel_d2 %.10lf vel %.10lf\n\n", lapx, lapz, vel, model->cube[pos]);
+            // }
+            // END DEBUG
         }
     }
 }
