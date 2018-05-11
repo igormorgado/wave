@@ -1,7 +1,7 @@
 LIBS = -lm
 CFLAGS = -Wall -g -ggdb 
 OBJS = tic ricker utils simulation velocity_model globals wavefield
-UTILS = bfdiff d2f
+UTILS = bfdiff d2f oldwave
 PROGS = wave 
 TESTS = test_tic test_ricker
 CC = gcc
@@ -43,7 +43,7 @@ utils:
 	$(CC) -c utils.c $(CFLAGS)
 
 wavefield:
-	$(CC) -c wavefield.c $(CFLAGS)
+	$(CC) -c wavefield.c $(CFLAGS) $(LIBS)
 
 
 ##################################################
@@ -68,6 +68,9 @@ bfdiff: utils
 
 d2f:
 	$(CC) -o d2f d2f.c $(CFLAGS) 
+
+oldwave:
+	$(CC) -o oldwave oldwave.c $(CFLAGS) $(LIBS)
 
 
 ##################################################

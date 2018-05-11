@@ -3,6 +3,7 @@
 
 #include "globals.h"
 #include "simulation.h"
+#include "tic.h"
 
 double stable_dt(velocity_model *model, ricker_source *source) 
 {
@@ -61,8 +62,25 @@ void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s
     // Get position of injection in the flattened array
     size_t pos = w->nx * s->z + s->x;
 
-    w->grid[pos] += m->cube[pos] * s->wavelet->trace[it];
+    w->grid[pos] -= m->cube[pos] * s->wavelet->trace[it];
 
     if(verbose)
-        fprintf(stderr, "%010zu injected @ [%zu,%zu] %lf\n", it, w->nx, w->nz, s->wavelet->trace[it]);
+        fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, w->nx, w->nz, pos, s->wavelet->trace[it]);
+}
+
+
+void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd)
+{
+
+    size_t ntrec = s->sample/s->dt;
+
+    if( it % ntrec == 0)  {
+        fwrite(w->grid, sizeof(double), w->nx * w->nz, fd);
+        if(verbose) 
+            fprintf(stderr, "Iteration step: %zu/%zu -- ", it, s->steps);
+
+        if(ticprt)
+            tic();
+        
+    }
 }

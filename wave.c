@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 {
 
     /* Default values */
-    double time = 1.;               // Simulation time
+    double time = .25;               // Simulation time
     double sample = 0.008;          // Sampling rate to save
 
     size_t nx = 500;                // Model grid size X axis
@@ -62,14 +62,14 @@ int main(int argc, char *argv[])
                                     // Maybe instead add a velocity model
                                     // as input data from stdin
 
-    double freq = 25;               // Ricker wavelet frequency
+    double freq = 20;               // Ricker wavelet frequency
 
     double delay = 0.;              // Ricker source start delay
     size_t sx = nx/2 + 1;           // Ricker source position x
     size_t sz = nz/2 + 1;           // Ricker source position z
 
-    int verbose = 0;
-    int ticprt = 0;
+    verbose = 0;
+    ticprt = 0;
 
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         {"sx",      required_argument,  0,  'w'},   // Source X position
         {"sz",      required_argument,  0,  'q'},   // Source Y position
         {"vel",     required_argument,  0,  'v'},   // Media constant velocity
-        {"tic",     required_argument,  0,  'i'},   // Show tic steps
+        {"tic",     no_argument,        0,  'i'},   // Show tic steps
         {"verbose", no_argument,        0,  'V'},   // verbose mode / with debug
         {"help",    no_argument,        0,  'h'},   // Call for help
         {0,         0,                  0,  0  }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
     int opt = 0;
     int long_index = 0;
-    while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:h", long_options, &long_index)) != -1)
+    while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:ih", long_options, &long_index)) != -1)
     {
         switch(opt) {
             case 't':
@@ -164,6 +164,8 @@ int main(int argc, char *argv[])
         fprintf(stderr,"%7s: %lf\n", "freq", wavelet->frequency);
         fprintf(stderr,"%7s: %zu\n", "sx", source->x);
         fprintf(stderr,"%7s: %zu\n", "sz", source->z);
+        fprintf(stderr,"%7s: %d\n", "verbose", verbose);
+        fprintf(stderr,"%7s: %d\n", "tic", ticprt);
     }
 
     if(isatty(fileno(stdout)))
@@ -200,54 +202,10 @@ int main(int argc, char *argv[])
     {
 
         simulation__inject_source(P, model, source, it);
-        wavefield__laplacian4(P, model);
-    //     simulation__perfect_match_layer(*wavefield, *model);
-    //     simulation__swap(wavefield, wavefield_t);
-    //     simulation__save_step(wavefield);   // Only saves if matches sampling rate
-    // }
-
-    //     // 8th order in space
-    //     // for(int iz=3; iz < nz-3; iz++) {
-    //     //     for(int ix=3; ix < nx-3; ix++) {
-    //     //         lapx = dxcoef8[0] * P2[iz][ix];
-    //     //         lapz = dzcoef8[0] * P2[iz][ix];
-    //     //         for(int c=1; c < 4; c++) {
-    //     //             lapx += dxcoef8[c]*(P2[iz-c][ix]+P2[iz+c][ix]);     // X direction
-    //     //             lapz += dzcoef8[c]*(P2[iz][ix-c]+P2[iz][ix+c]);     // Z direction
-    //     //         }
-    //     //         P1[iz][ix] = 2*P2[iz][ix] - P1[iz][ix] + vel * (lapx + lapz);
-    //     //     }
-    //     // }
-    //
-    //     // 4th order in space
-    //     // for(int iz=2; iz < nz-2; iz++) {
-    //     //     for(int ix=2; ix < nx-2; ix++) {
-    //     //         lapx = dxcoef4[0] * P2[iz][ix];
-    //     //         lapz = dzcoef4[0] * P2[iz][ix];
-    //     //         for(int c=1; c < 3; c++) {
-    //     //             lapx += dxcoef4[c]*(P2[iz-c][ix]+P2[iz+c][ix]);     // X direction
-    //     //             lapz += dzcoef4[c]*(P2[iz][ix-c]+P2[iz][ix+c]);     // Z direction
-    //     //         }
-    //     //         P1[iz][ix] = 2*P2[iz][ix] - P1[iz][ix] + vel * (lapx + lapz);
-    //     //     }
-    //     // }
-
-    //     // SWAP
-    //     for(int iz=0; iz < nz; iz++) {
-    //         for(int ix=0; ix < nx; ix++) {
-    //             Pt[iz][ix] = P2[iz][ix];
-    //             P2[iz][ix] = P1[iz][ix];
-    //             P1[iz][ix] = Pt[iz][ix];
-    //         }
-    //     }
-
-    //     // Save each ith steps
-    //     if( it % ntrec == 0) {
-    //         fprintf(stderr, "Iteration step: %d/%d -- ", it,steps);
-    //         tic();
-    //         for(int iz=0; iz<nz; iz++)
-    //             fwrite(P1[iz], sizeof(double), nx, stdout);
-    //     }
+        wavefield__laplacian4(P, model, simulation.dt);
+    //  wavefield__perfect_match_layer(P, *model);
+        wavefield__swap(P);
+        simulation__write(it, P, &simulation, stdout);
     }
 
     wavefield__destroy(P);

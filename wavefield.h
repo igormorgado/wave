@@ -21,9 +21,8 @@ wavefield * wavefield__create(size_t nx, size_t nz);
 
 void wavefield__destroy(wavefield *w);
 
-void wavefield__laplacian2(wavefield *w, velocity_model *m);
-void wavefield__laplacian4(wavefield *w, velocity_model *m);
-void wavefield__laplacian6(wavefield *w, velocity_model *m);
-void wavefield__laplacian8(wavefield *w, velocity_model *m);
+void wavefield__laplacian4(wavefield *w, velocity_model *m, double dt);
+
+void wavefield__swap(wavefield *wave);
 
 #endif
