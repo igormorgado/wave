@@ -3,3 +3,10 @@ data/
 seismic.py
 *.o
 wave
+*.bin
+bddiff
+wave
+bfdiff
+d2a
+d2f
+oldwave

@@ -42,6 +42,9 @@ tic:
 utils:
 	gcc -c utils.c $(CFLAGS)
 
+wavefield:
+	gcc -c wavefield.c $(CFLAGS) $(LIBS)
+
 ##################################################
 ## TESTS
 ##################################################
@@ -74,11 +77,6 @@ d2a:
 oldwave:
 	$(CC) -o oldwave oldwave.c $(CFLAGS) $(LIBS)
 
-oldwavew:
-	$(CC) -o oldwavew oldwavew.c $(CFLAGS) $(LIBS)
-
-oldwavef:
-	$(CC) -o oldwavef oldwavef.c $(CFLAGS) $(LIBS)
 
 ##################################################
 ## Clean all 
