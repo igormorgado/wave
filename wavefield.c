@@ -64,6 +64,8 @@ laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, 
     lp->border_size = lp->coef_len - 1;      // Size of border depends on stencil
 
     lp->dt = dt;
+    lp->dt_dx = lp->dt/m->dx;
+    lp->dt_dz = lp->dt/m->dz;
     lp->dxdx = m->dx * m->dx;               // Change in x squared
     lp->dzdz = m->dz * m->dz;               // Change in z squared
     
@@ -142,6 +144,46 @@ void wavefield__laplacian(wavefield *wave, velocity_model *model, laplacian_para
             // END DEBUG
         }
     }
+}
+
+void wavefield__perfect_match_layer(wavefield *wave, velocity_model *model, laplacian_params *lp)
+{
+    size_t pos;
+
+    // Left
+    for(size_t iz = 0; iz < wave->nz; iz++) {
+        for(size_t ix = 0; ix < lp->border_size; ix++) {
+            pos = wave->nx * iz + ix;
+            wave->grid_o[pos] = wave->grid[pos] + 
+                model->vel[pos] * lp->dt_dx * (wave->grid[pos+1] - wave->grid[pos]);
+        }
+    }
+
+    // Right
+    for(size_t iz = 0; iz < wave->nz; iz++) {
+        for(size_t ix = (wave->nx - lp->border_size); ix < wave->nx; ix++) {
+            pos = wave->nx * iz + ix;
+            wave->grid_o[pos] = wave->grid[pos] - 
+                model->vel[pos] * lp->dt_dx * (wave->grid[pos] - wave->grid[pos-1]);
+        }
+    }
+
+    // Bottom
+    for(size_t iz = (wave->nz - lp->border_size); iz < wave->nz; iz++) {
+        for(size_t ix = 0; ix < wave->nx; ix++) {
+            pos = wave->nx * iz + ix;
+            wave->grid_o[pos] = wave->grid[pos] - 
+                model->vel[pos] * lp->dt_dx * (wave->grid[pos] - wave->grid[pos-model->nx]);
+        }
+    }
+
+    // DEBUG IF NEEDED
+    // fprintf(stderr, "o[%zu]: %lf + v[%zu]: %lf * dt/dx %lf * (o[%zu] %lf - o[%zu] %lf)\n",
+    //         pos, wave->grid_o[pos], 
+    //         pos, model->vel[pos], lp->dt_dx,
+    //         pos+1, wave->grid_o[pos+1], 
+    //         pos, wave->grid_o[pos]);
+
 }
 
 void wavefield__swap(wavefield *wave)
