@@ -11,17 +11,17 @@ velocity_model * velocity_model__create(size_t nx, size_t nz, double dx, double 
     return model;
 }
 
-//  Create and reserve memory to VM cube
-void  velocity_model__constant_cube(velocity_model *model, double velocity) {
+//  Create and reserve memory to VM velocity
+void  velocity_model__constant_velocity(velocity_model *model, double velocity) {
     model->v_min = velocity;
     model->v_max = velocity;
-    model->cube = malloc(model->nx * model->nz * sizeof (double));
+    model->vel = malloc(model->nx * model->nz * sizeof (double));
     for(int i = 0; i < model->nx * model->nz; i++)
-        model->cube[i] = velocity;
+        model->vel[i] = velocity;
 }
 
 void velocity_model__destroy(velocity_model *model)
 {
-    free(model->cube);
+    free(model->vel);
     free(model);
 }

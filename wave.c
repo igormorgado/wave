@@ -71,6 +71,25 @@ int main(int argc, char *argv[])
     verbose = 0;
     ticprt = 1;
 
+    velocity_model *model = velocity_model__create(nx, nz, dx, dz);
+
+    ricker_wavelet *wavelet = ricker__create(freq);
+    ricker_source  *source  = ricker__model(wavelet, sx, sz, delay); //model is awful name
+
+    // Maybe create a function and work as a pointer... maybe...
+    simulation_params simulation;
+    simulation.time = time;
+    simulation.sample = sample;
+
+
+    /***************************************************
+     *
+     * Parse Arguments
+     *
+     **************************************************/
+    int opt = 0;
+    int long_index = 0;
+
     static  struct option long_options[] = {
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
         {"sample",  required_argument,  0,  'd'},   // Wave simulation sampling
@@ -88,21 +107,6 @@ int main(int argc, char *argv[])
         {0,         0,                  0,  0  }
     };
 
-    /* 
-     * Create and initialize structures
-     * (data is created after, since we need correctly malloc)
-     */
-    velocity_model *model = velocity_model__create(nx, nz, dx, dz);
-
-    ricker_wavelet *wavelet = ricker__create(freq);
-    ricker_source  *source  = ricker__model(wavelet, sx, sz, delay); //model is awful name
-
-    simulation_params simulation;
-    simulation.time = time;
-    simulation.sample = sample;
-
-    int opt = 0;
-    int long_index = 0;
     while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:ih", long_options, &long_index)) != -1)
     {
         switch(opt) {
@@ -175,59 +179,90 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    /* Now all parameters are correctly set, we can create
-     * the data inside the structures and check for stability
-     */
 
-    // Generate constant velocity model
-    velocity_model__constant_cube(model, vel);
+    /***************************************************
+     *
+     * Create velocity model
+     *
+     **************************************************/
+    velocity_model__constant_velocity(model, vel);
 
+
+    /***************************************************
+     *
+     * Model/Test stability
+     *
+     **************************************************/
     simulation.dt = stable_dt(model, source);
     simulation.steps = simulation.time / simulation.dt + 1;
+    simulation.ntrec = simulation.sample/simulation.dt;
 
-    // Check stability before everything
+    // Test stability
     if(isstable(source, model, &simulation) != SIMUL_OK)
     {
-       fprintf(stderr, "Erro no modelo\n");
+       fprintf(stderr, "Unstable model\n");
        exit(EXIT_FAILURE);
     }
 
+    
+    /***************************************************
+     *
+     * Create data
+     *
+     **************************************************/
     ricker__create_trace(wavelet, simulation.time, simulation.dt);
 
     wavefield *P = wavefield__create(model->nx, model->nz);
 
-    if(verbose) 
-        for(size_t i=0; i< 20 ; i++)
-            fprintf(stderr, "WAVELET(%5zu) t: %lf  v: %20.17lf\n", i, i*simulation.dt, source->wavelet->trace[i]);
+    /***************************************************
+     *
+     * Laplacian parameters 
+     *
+     **************************************************/
+    laplacian_params *lp = wavefield__laplacian_params(model, 4, simulation.dt);
 
-    // DEBUG
-    // size_t POS = P->nx * source->z + source->x;
-    // fprintf(stderr, "Source at %zu,%zu flatenned %zu\n", source->x, source->z, POS);
-    // DEBUG
     
+    /***************************************************
+     *
+     * Iterate timesteps
+     *
+     **************************************************/
     for(size_t it = 0; it < simulation.steps; it++)
     {
 
         simulation__inject_source(P, model, source, &simulation, it);
-        wavefield__laplacian(P, model, simulation.dt);
+        wavefield__laplacian(P, model, lp);
     //  wavefield__perfect_match_layer(P, *model);
         wavefield__swap(P);
         simulation__write(it, P, &simulation, stdout);
     }
 
+
+    /***************************************************
+     *
+     * Memory  cleanup
+     *
+     **************************************************/
+    fflush(stdout);
+    wavefield__destroy_laplacian_params(lp);
     wavefield__destroy(P);
     ricker__destroy_source(source);
     velocity_model__destroy(model);
 
-    if(verbose)
-        fprintf(stderr, "xmovie n1=%zu n2=%zu d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
 
+    /***************************************************
+     *
+     * Finishing
+     *
+     **************************************************/
     if(ticprt) {
         fprintf(stderr, "TOTAL ");
         tic();
     }
 
-    fflush(stdout);
+    if(verbose)
+        fprintf(stderr, "xmovie n1=%zu n2=%zu d1=%lf d2=%lf clip=0.5 loop=2\n", nx, nz, dx, dz);
+
     fflush(stderr);
 
     return 0;

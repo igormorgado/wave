@@ -26,6 +26,7 @@ typedef struct simulation_params
     double dt;              /* Simulation timestep */
     double sample;          /* Sampling time */
     size_t steps;           /* Number of simulation steps */
+    size_t ntrec;           /* Frames to be saved */
 } simulation_params;
 
 

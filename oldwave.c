@@ -24,172 +24,229 @@ double tic(void)
 }
 
 
-float ricker(float t, float f, float s)
+double ricker(double t, double f, double s)
 {
     /* return a ricker wavelet value.
      * Params:
      *  t: Time to evaluate the ricker wavelet
-     *  f: central frequency
+     *  f: central freq
      *  s: timeshift
      *
      * For a *zero* phase set s to 0
      * For a *minimum* phase set s to -period
      */
 
-    float p = powf(M_PI * f * (t+s), 2);
+    double p = powf(M_PI * f * (t+s), 2);
     return ( 1 - 2*p ) * exp(-p);
 }
 
-float ricker__cnt2cut(float central)
+double ricker__cnt2cut(double central)
 {
-    /* Convert central frequency into cut frequency */
+    /* Convert central freq into cut freq */
     return (central * M_PI)/sqrt(6);
 }
 
-float ricker__cut2cnt(float cut)
+double ricker__period(double cnt_freq)
 {
-    /* Convert cut frequency into central frequency */
-    return cut * (sqrt(6)/M_PI);
-}
-
-float ricker__period(float cnt_freq)
-{
-    /* Return the period of a ricker wavelet of central frequency given */
+    /* Return the period of a ricker wavelet of central freq given */
     return 6 / ( M_PI * cnt_freq * sqrt(2));
 }
 
+// **************************************************************************
+// CODES ARE EXACLTY THE SAME TILL HERE
+// **************************************************************************
 int main(int argc, char *argv[])
 {
+    /***************************************************
+     *
+     * Default parameters 
+     *
+     **************************************************/
+    double time = .25;          /* Simulation time */
+    double sample = 0.008;      /* save each 8ms */
+    size_t steps;               /* Number of steps */
+    double dt;                  /* Simulation time step */
+
+    // Model Parameters
+    int   nx = 500;             /* Number of X cells / columns */
+    int   nz = 500;             /* Number of Z cells / lines */
+    double dx = 1;              /* Size of X grid cell */  
+    double dz = 1;              /* Size of Z grid cell */  
+    double vel = 1500;          /* Water speed */
+
+    // Source Parameters
+    double freq = 20;           /* Ricker dominant freq */
+    double  period = 0.;         /* Ricker wavelet period */
+    size_t  sx = nx/2 + 1;      /* source X position */
+    size_t  sz = nz/2 + 1;      /* source Z position */
+
+    size_t ntrec;               /* Save wavefield interval */
+    int verbose = 0;            /* verbose running */
+
+
+    /***************************************************
+     *
+     * Parse Arguments
+     *
+     **************************************************/
     if(isatty(fileno(stdout))) {
         fprintf(stderr, "STDOUT must be a 'pipe' or 'file'\n");
         exit(1);
     }
 
-    float t = .25;         /* Simulation time */
-    float frequency = 20;   /* Ricker dominant frequency */
-    int   nx = 500;         /* Number of X cells / columns */
-    int   nz = 500;         /* Number of Z cells / lines */
-    float dx = 1;           /* Size of X grid cell */  
-    float dz = 1;           /* Size of Z grid cell */  
-    float vel = 1500;       /* Water speed */
-    int   sx = nx/2 + 1;          /* source X position */
-    int   sz = nz/2 + 1;          /* source Z position */
-    float   dtrec = 0.008;       /* save each 8ms */
-
-    // Simulation parameters
-    int steps;              /* Number of steps */
-    float dt;               /* Simulation time step */
     
-    // Ricker parameters
-    float period;           /* Ricker wavelet period */
+    /***************************************************
+     *
+     * Model/Test stability
+     *
+     **************************************************/
+    double mu = 5.;
+    double k = 5.;
+    double h = fmax(dx,dz);
+    double freq_max = ricker__cnt2cut(freq);
+    double disp = vel / (k*freq_max);
+    double est = h / (mu * vel);
 
-    // Mathematical parameters;
-    float lapx;
-    float lapz;
-    float coef[] = { -5./2, 4./3, -1./12 };
-
-    float dxcoef[3];
-    float dzcoef[3];
-    for( int i=0; i< 3; i++)  {
-        dxcoef[i] = coef[i]/(dx*dx);
-        dzcoef[i] = coef[i]/(dz*dz);
-    }
-
-    // TESTE DE ESTABILIDADE e DISPERSAO
-    float mu = 5;
-    float k = 5;
-    float h = fmax(dx,dz);
-    float freq_max = ricker__cnt2cut(frequency);
-    float disp =  vel / (k*freq_max);
-    float est = h / (mu * vel);
+    // stable_dt()
     dt = est;
+    steps = time/dt + 1;       /* Steps is a ratio between time and dt + 1 */
+    ntrec = sample/dt; 
 
-    fprintf(stderr, "freq_dom: %f \t freq_max: %f\n", frequency, freq_max);
+    period = ricker__period(freq);
 
-    fprintf(stderr, "h: %f <= [vel: %f / (k: %f * f: %f)] = disp: %f\n",
-            h, vel, k, freq_max, disp);
-
+    // isstable()
     if (h > disp) {
-        fprintf(stderr, "MODELAGEM DISPERSIVA h > disp\n");
+        fprintf(stderr, "Unstable model\n");
         exit(1);
     }
 
-    fprintf(stderr, "dt: %f <= [ h: %f / (mu: %f * vmax: %f) ] = est:  %f\n",
-            dt, h, mu, vel, est);
 
-    if (dt > est) {
-        fprintf(stderr, "MODELAGEM INSTAVEL dt > est");
-        exit(1);
-    }
+    /***************************************************
+     *
+     * Create data
+     *
+     **************************************************/
 
-    steps = t/dt + 1;       /* Steps is a ratio between time and dt + 1 */
-    period = ricker__period(frequency);
-
-    float *ricker_wave = malloc(steps * sizeof *ricker_wave);
-
-    // Create the ricker source array
+    // ricker__create_trace()
+    double *ricker_wave = malloc(steps * sizeof *ricker_wave);
     for(int i = 0; i < steps; i++)
-        ricker_wave[i] = ricker(i * dt, frequency, -period);
+        ricker_wave[i] = ricker(i * dt, freq, -period);
 
-    // Allocate wavefield 
-    float *P1[nz], *P2[nz], *Pt[nz];
+
+    // wavefield__create()
+    double *P1[nz], *P2[nz], *Pt[nz];
     for(int i = 0; i < nz; i++) {
-        P1[i] = calloc(nx, sizeof (float));
-        P2[i] = calloc(nx, sizeof (float));
-        Pt[i] = calloc(nx, sizeof (float));
+        P1[i] = calloc(nx, sizeof (double));
+        P2[i] = calloc(nx, sizeof (double));
+        Pt[i] = calloc(nx, sizeof (double));
     }
 
-    // Iterate over timesteps
-    vel = powf(vel * dt, 2);
 
-    int ntrec = dtrec/dt; 
+    /***************************************************
+     *
+     * Laplacian parameters 
+     *
+     **************************************************/
 
-    for(int it = 0; it < steps; it ++) {
 
-        // Inject the source
-        P1[sz][sx] += vel*ricker_wave[it];
+    // wavefield__laplacian_params()
+    double lapx;
+    double lapz;
+    double coef[] = { -5./2, 4./3, -1./12 };
+
+    size_t border_size = 2;
+    size_t coef_len = 3;
+
+    double dxdx = dx*dx;
+    double dzdz = dz*dz;
+
+    double coef_dx2[coef_len];
+    double coef_dz2[coef_len];
+    for(size_t i=0; i< coef_len; i++)  {
+        coef_dx2[i] = coef[i]/dxdx;
+        coef_dz2[i] = coef[i]/dzdz;
+    }
+
+
+    /***************************************************
+     *
+     * Iterate timesteps
+     *
+     **************************************************/
+    double vel_dt2;
+    for(size_t it = 0; it < steps; it ++) {
+
+        // Calculate (vel/dt)^2
+        vel_dt2 = powf(vel * dt, 2);
+
+        // simulation__inject_source;
+        P1[sz][sx] += vel_dt2*ricker_wave[it];
         
-        for(int iz=2; iz < nz-2; iz++) {
-            for(int ix=2; ix < nx-2; ix++) {
-                lapx = dxcoef[0] * P2[iz][ix];
-                lapz = dzcoef[0] * P2[iz][ix];
-                for(int c=1; c < 3; c++) {
-                    lapx += dxcoef[c]*(P2[iz][ix-c]+P2[iz][ix+c]);     // X direction
-                    lapz += dzcoef[c]*(P2[iz-c][ix]+P2[iz+c][ix]);     // Z direction
+        // wavefield__laplacian
+        for(size_t iz=border_size; iz < nz-border_size; iz++) {
+            for(size_t ix=border_size; ix < nx-border_size; ix++) {
+
+                // Stencil center
+                lapx = coef_dx2[0] * P2[iz][ix];
+                lapz = coef_dz2[0] * P2[iz][ix];
+
+                // Stencil borders
+                for(size_t ic=1; ic < coef_len; ic++) {
+                    lapx += coef_dx2[ic]*(P2[iz][ix-ic]+P2[iz][ix+ic]);     // X direction
+                    lapz += coef_dz2[ic]*(P2[iz-ic][ix]+P2[iz+ic][ix]);     // Z direction
                 }
-                P1[iz][ix] = 2*P2[iz][ix] - P1[iz][ix] + vel * (lapx + lapz);
+
+                // Second order timestep
+                P1[iz][ix] = 2*P2[iz][ix] - P1[iz][ix] + vel_dt2 * (lapx + lapz);
             }
         }
 
-        // SWAP
-        for(int iz=0; iz < nz; iz++) {
-            for(int ix=0; ix < nx; ix++) {
+        // wavefield__swap
+        for(size_t iz=0; iz < nz; iz++) {
+            for(size_t ix=0; ix < nx; ix++) {
                 Pt[iz][ix] = P2[iz][ix];
                 P2[iz][ix] = P1[iz][ix];
                 P1[iz][ix] = Pt[iz][ix];
             }
         }
 
-        // Save each ith steps
+        // simulation__write
         if( it % ntrec == 0) {
-            fprintf(stderr, "Iteration step: %7d/%7d  --  ", it, steps);
-            tic();
             for(int iz=0; iz<nz; iz++) 
-                fwrite(P1[iz], sizeof(float), nx, stdout);
+                fwrite(P1[iz], sizeof(double), nx, stdout);
+
+            fprintf(stderr, "Iteration step: %7zu/%7zu  --  ", it, steps);
+            tic();
         }
     }
 
+
+    /***************************************************
+     *
+     * Memory  cleanup
+     *
+     **************************************************/
+    fflush(stdout);
     free(ricker_wave);
     for(int i = 0; i < nz; i++) {
         free(P1[i]);
         free(P2[i]);
         free(Pt[i]);
     }
-    fflush(stdout);
-    fflush(stderr);
+
+
+    /***************************************************
+     *
+     * Finishing
+     *
+     **************************************************/
     fprintf(stderr,"TOTAL ");
     tic();
-    fprintf(stderr, "xmovie n1=%d n2=%d d1=%f d2=%f clip=0.5 loop=2 < \n", nx, nz, dx, dz);
+
+    if(verbose)
+        fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2 < \n", nx, nz, dx, dz);
+
+    fflush(stderr);
 
     return 0;
 }

@@ -1,19 +1,19 @@
-LIBS = -lm
+LIBS = -lm 
 CFLAGS = -Wall -g -ggdb 
+# -pg
 OBJS = tic ricker utils simulation velocity_model globals wavefield
-UTILS = bfdiff d2f oldwave d2a
-PROGS = wave 
+UTILS = bfdiff bddiff d2f d2a
+PROGS = wave oldwave
 TESTS = test_tic test_ricker
 CC = gcc
 
 SRC=$(wildcard *.c)
 
+all: $(OBJS) $(UTILS) $(PROGS)
+
 wave: $(OBJS) 
 	$(CC) -c wave.c $(CFLAGS) 
 	$(CC) -o wave wave.o wavefield.o globals.o ricker.o tic.o simulation.o velocity_model.o $(CFLAGS) $(LIBS)
-
-all: $(OBJS) $(UTILS) $(PROGS)
-	@echo Pick $(PROGS)
 
 tests: $(TESTS)
 
@@ -66,6 +66,9 @@ test_ricker: ricker
 bfdiff: utils
 	$(CC) -o bfdiff bfdiff.c utils.o $(CFLAGS) 
 
+bddiff: utils
+	$(CC) -o bddiff bddiff.c utils.o $(CFLAGS) 
+
 d2f:
 	$(CC) -o d2f d2f.c $(CFLAGS) 
 
@@ -75,6 +78,11 @@ d2a:
 oldwave:
 	$(CC) -o oldwave oldwave.c $(CFLAGS) $(LIBS)
 
+oldwavew:
+	$(CC) -o oldwavew oldwavew.c $(CFLAGS) $(LIBS)
+
+oldwavef:
+	$(CC) -o oldwavef oldwavef.c $(CFLAGS) $(LIBS)
 
 ##################################################
 ## Clean all 
