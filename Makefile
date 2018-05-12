@@ -28,23 +28,19 @@ globals:
 	$(CC) -c globals.c $(CFLAGS)
 
 ricker:
-	$(CC) -c ricker.c $(CFLAGS) $(LIBS)
+	gcc -c ricker.c ${CFLAGS}
 
 simulation:
-	$(CC) -c simulation.c $(CFLAGS)
+	gcc -c simulation.c ${CFLAGS}
 
 velocity_model:
-	$(CC) -c velocity_model.c $(CFLAGS)
+	gcc -c velocity_model.c ${CFLAGS}
 
 tic:
-	$(CC) -c tic.c $(CFLAGS)
+	gcc -c tic.c $(CFLAGS)
 
 utils:
-	$(CC) -c utils.c $(CFLAGS)
-
-wavefield:
-	$(CC) -c wavefield.c $(CFLAGS) $(LIBS)
-
+	gcc -c utils.c $(CFLAGS)
 
 ##################################################
 ## TESTS

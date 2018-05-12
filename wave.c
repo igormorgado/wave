@@ -14,10 +14,6 @@
 #include "wavefield.h"
 #include "simulation.h"
 
-/*
- * TODO:
- * 
- */
 
 void print_tryhelp(const char command[]) {
     fprintf(stderr, "Try %s -help for more info\n", command);
