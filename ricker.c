@@ -1,7 +1,9 @@
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "ricker.h"
-// #include "simulation.h"
+#include "globals.h"
 
 ricker_wavelet *ricker__create(double frequency)
 {
@@ -27,6 +29,42 @@ ricker_source *ricker__model(ricker_wavelet *wavelet, size_t x, size_t z, double
 }
 
 
+int ricker__write_to_file(ricker_wavelet *wavelet, const char filename[])
+{
+    /* Write a ricker wavelet to disk */
+    FILE *fp = fopen(filename, "wb");
+
+    if(verbose)
+        fprintf(stderr, "Writing wavelet to %s\n", filename);
+
+    int bytes =fwrite(wavelet->trace, sizeof(wavelet->trace), 1, fp);
+    fclose(fp);
+
+    return bytes;
+}
+
+ricker_wavelet * ricker__read_from_file(
+        const char filename[], 
+        double frequency, 
+        double period, 
+        double shift)
+{
+    /* Read a ricker source from a filename */
+    FILE *fp = fopen(filename, "rb");
+    int szbytes = fseek(fp, 0L, SEEK_END);
+    rewind(fp);
+
+    ricker_wavelet *wavelet = malloc(sizeof *wavelet + szbytes);
+    fwrite(wavelet->trace, szbytes, 1, fp);
+    fclose(fp);
+
+    wavelet->frequency = frequency;
+    wavelet->period = period;
+    wavelet->shift = shift;
+
+    return wavelet;
+}
+
 void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 {
     /* Create the traces to ricker wavelet with shift 's' seconds
@@ -39,14 +77,6 @@ void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
     for(int i = 0; i < steps; i++)
         wavelet->trace[i] = ricker__points(i * dt, wavelet->frequency, -wavelet->period);
 }
-
-
-// FIXME: Using this function breaks compilation, since it has a self-refering
-// function between  ricker and simulation.
-// void ricker__create_trace_from_simulation(ricker_wavelet *wavelet, simulation_params *simulation)
-// {
-//     ricker__create_trace(wavelet, simulation->time, simulation->dt);
-// }
 
 
 void ricker__destroy(ricker_wavelet *wavelet)

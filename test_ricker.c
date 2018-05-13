@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
 
     float cnt_freq = 20.0;
-    float cut_freq = ricker__cnt2cut(cnt_freq);
+    float cut_freq = ricker__cut2cnt(cut_freq);
     float period = ricker__period(cnt_freq);
 
     float dt = 0.0001;

@@ -6,8 +6,6 @@
 
 #include "globals.h"
 
-// #include "simulation.h"
-// #include "ricker.h"
 
 typedef struct velocity_model 
 {
