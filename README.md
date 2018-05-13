@@ -19,6 +19,12 @@ $ cd wave
 # make wave
 ```
 
+3. If you have Seismic Unix correctly installed. Test with:
+
+```
+$ ./run_test.sh
+```
+
 
 RECOMENDATIONS
 ==============
