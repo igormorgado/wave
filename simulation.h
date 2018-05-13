@@ -30,6 +30,10 @@ typedef struct simulation_params
 } simulation_params;
 
 
+simulation_params * simulation__create();
+
+void simulation__destroy(simulation_params *sp);
+
 double stable_dt(velocity_model *model, ricker_source *source);
 
 SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_params *simul);
@@ -37,5 +41,6 @@ SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_p
 void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, simulation_params *simul, size_t it);
 
 void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd);
+
 
 #endif

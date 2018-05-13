@@ -5,6 +5,18 @@
 #include "simulation.h"
 #include "tic.h"
 
+simulation_params * simulation__create(void)
+{
+    simulation_params *sp = malloc(sizeof *sp);
+    return sp;
+}
+
+void simulation__destroy(simulation_params *sp)
+{
+    free(sp);
+}
+
+
 double stable_dt(velocity_model *model, ricker_source *source) 
 {
     /* Returns a stable dT based in velocity model parameters */
@@ -38,8 +50,8 @@ SIMUL_STATUS isstable(ricker_source *source,
     /* First checks dispersion against grid cell size */
     if(fmax(model->dx, model->dz) > (model->v_min / (k*f_max)))
     {
-        fprintf(stderr, "Grid cell is too large, Velocity Model minimum");
-        fprintf(stderr, "velocity is too low or Source frequency is too high.");
+        fprintf(stderr, "Grid cell is too large, velocity model minimum ");
+        fprintf(stderr, "velocity is too low or source frequency is too high.");
         fprintf(stderr, "fix one of those.\n");
         fprintf(stderr, "h: %lf\tV_min: %lf\tFreq: %lf\n", h, model->v_min, f_max);
         simul_status &= SIMUL_DISPERSIVE;

@@ -1,7 +1,7 @@
 LIBS = -lm 
 CFLAGS = -Wall -g -ggdb 
 # -pg
-OBJS = tic ricker utils simulation velocity_model globals wavefield help
+OBJS = tic ricker utils simulation velocity_model globals wavefield help parse
 UTILS = bfdiff bddiff d2f d2a
 PROGS = wave oldwave
 TESTS = test_tic test_ricker
@@ -13,7 +13,7 @@ all: $(OBJS) $(UTILS) $(PROGS)
 
 wave: $(OBJS) 
 	$(CC) -c wave.c $(CFLAGS) 
-	$(CC) -o wave wave.o help.o wavefield.o globals.o ricker.o tic.o simulation.o velocity_model.o $(CFLAGS) $(LIBS)
+	$(CC) -o wave wave.o help.o wavefield.o globals.o ricker.o tic.o simulation.o velocity_model.o parse.o $(CFLAGS) $(LIBS)
 
 tests: $(TESTS)
 
@@ -23,6 +23,9 @@ tests: $(TESTS)
 ##################################################
 
 objs: $(OBJS)
+
+parse:
+	gcc -c parse.c $(CFLAGS) $(LIBS)
 
 help:
 	gcc -c help.c $(CFLAGS) $(LIBS)

@@ -2,6 +2,9 @@
 #define _VELOCITY_MODEL_H_
 
 #include <stdlib.h>
+#include <stdio.h>
+
+#include "globals.h"
 
 // #include "simulation.h"
 // #include "ricker.h"

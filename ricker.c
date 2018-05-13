@@ -5,6 +5,7 @@
 
 ricker_wavelet *ricker__create(double frequency)
 {
+    // TODO: Maybe merge create trace here for a single memory allocation
     /* Return a ricker_wavelet structure without any traces */
     ricker_wavelet *wavelet = malloc(sizeof (ricker_wavelet));
     wavelet->frequency = frequency;
