@@ -58,5 +58,5 @@ USE CASES
 ```
 ./wave -order 8 -t 0.25 > wave8th.bin
 ./wave -order 2 -t 0.25 > wave2th.bin
-./bddiff wave2th.bin < wave8th.bin | ./d2f | xmovie n1=500 n2=500 d1=1.000000 d2=1.000000 clip=0.5 loop=2
+./bddiff wave2th.bin < wave8th.bin | ./d2f | xmovie n1=500 n2=500 d1=1 d2=1 clip=0.01 loop=2
 ```
