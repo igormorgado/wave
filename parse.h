@@ -13,6 +13,7 @@ typedef struct args {
     double time;
     double sample;
     double frequency;
+    size_t order;
     size_t sx;
     size_t sz;
     double sd;

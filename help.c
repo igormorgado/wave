@@ -16,6 +16,7 @@ void print_help(const char command[]) {
     fprintf(stderr, "\nSimulation Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-time   <double>", "Simulation time in seconds. Default: .25s");
     fprintf(stderr, "%-18s %s\n", "-sample <double>", "Sampling frequency to output. Default 0.008s");
+    fprintf(stderr, "%-18s %s\n", "-order  <int>",    "Laplacian order. Default: 4.");
     fprintf(stderr, "\nWavelet Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-freq <double>",   "Ricker wavelet frequency in Hz. Default: 25Hz");
     fprintf(stderr, "\nModel Parameters:\n\n");
@@ -26,4 +27,5 @@ void print_help(const char command[]) {
     fprintf(stderr, "\nSource Parameters:\n\n");
     fprintf(stderr, "%-18s %s\n", "-sx <int>",        "Source position in Grid X Component in units. Default: nx/2");
     fprintf(stderr, "%-18s %s\n", "-sz <int>",        "Source position in Grid Z Component in units. Default: nz/2");
+    fprintf(stderr, "%-18s %s\n", "-sd <double>",     "Source delay. Default: 0");
 }

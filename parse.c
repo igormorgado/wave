@@ -3,8 +3,9 @@
 args * arg_parse(int argc, char *argv[], FILE *fd)
 {
     /* Default values */
-    double time = .25;               // Simulation time
+    double time = .25;              // Simulation time
     double sample = 0.008;          // Sampling rate to save
+    size_t order = 4;               // Simulation order
 
     size_t nx = 500;                // Model grid size X axis
     size_t nz = 500;                // Model grid size Z axis
@@ -30,6 +31,7 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
         {"time",    required_argument,  0,  't'},   // simumation time in seconds
         {"sample",  required_argument,  0,  'd'},   // Wave simulation sampling
         {"freq",    required_argument,  0,  'f'},   // ricker wavelet frequency
+        {"order",   required_argument,  0,  'o'},   // Simulation order
         {"nx",      required_argument,  0,  'x'},   // number of cells in X dir
         {"nz",      required_argument,  0,  'z'},   // number of cells in Y dir
         {"dx",      required_argument,  0,  's'},   // Size of grid in X dir
@@ -44,7 +46,7 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
         {0,         0,                  0,  0  }
     };
 
-    while ((opt = getopt_long_only(argc, argv, "t:d:f:x:z:s:a:v:w:q:e:ih", long_options, &long_index)) != -1)
+    while ((opt = getopt_long_only(argc, argv, "t:d:f:o:x:z:s:a:v:w:q:e:ihV", long_options, &long_index)) != -1)
     {
         switch(opt) {
             case 't':
@@ -53,6 +55,8 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
                 sample = atof(optarg); break;
             case 'f':
                 frequency = atof(optarg); break;
+            case 'o':
+                order = atoi(optarg); break;
             case 'w':
                 sx = atoi(optarg); break;
             case 'q':
@@ -85,6 +89,7 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
         fprintf(stderr,"Command line parameters\n");
         fprintf(stderr,"%7s: %lf\n", "time", time);
         fprintf(stderr,"%7s: %lf\n", "sample", sample);
+        fprintf(stderr,"%7s: %zu\n", "order", order);
         fprintf(stderr,"%7s: %zu\n", "nx", nx);
         fprintf(stderr,"%7s: %zu\n", "nz", nz);
         fprintf(stderr,"%7s: %lf\n", "dx", dx);
@@ -111,6 +116,7 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
     ap->time = time;
     ap->sample = sample;
     ap->frequency = frequency;
+    ap->order = order;
     ap->sx = sx;
     ap->sz = sz;
     ap->sd = sd;

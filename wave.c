@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     wavefield *P = wavefield__create(model->nx, model->nz);
 
     /* Pre calculate  Laplacian parameters */
-    laplacian_params *lp = wavefield__laplacian_params(model, 4, simulation->dt);
+    laplacian_params *lp = wavefield__laplacian_params(model, ap->order, simulation->dt);
     
     /* Iterate timesteps */
     for(size_t it = 0; it < simulation->steps; it++)

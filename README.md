@@ -47,7 +47,16 @@ HOW TO USE
 
 **bddiff**: calculate the difference between two binary double files 
 
-
-
 For more infor check command helps.
 
+
+USE CASES
+=========
+
+1. Testing residuals from 8th order and 2th order
+
+```
+./wave -order 8 -t 0.25 > wave8th.bin
+./wave -order 2 -t 0.25 > wave2th.bin
+./bddiff wave2th.bin < wave8th.bin | ./d2f | xmovie n1=500 n2=500 d1=1.000000 d2=1.000000 clip=0.5 loop=2
+```
