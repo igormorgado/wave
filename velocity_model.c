@@ -117,14 +117,12 @@ velocity_model *velocity_model__read_sub_from_file(
     size_t c = 0;
     sub->v_min = model->vel[nxa + nx * nza];
     sub->v_max = model->vel[nxa + nx * nza];
-    for(size_t iz = 0; iz < model->nz; iz++) {
-        for(size_t ix = 0; ix < model->nx; ix++) {
-            if(ix >= nxa && ix < nxb && iz >= nza && iz < nzb) {
-                sub->vel[c] = model->vel[ix + iz * model->nx];
-                sub->v_min=fmin(sub->v_min, sub->vel[c]);
-                sub->v_max=fmax(sub->v_max, sub->vel[c]);
-                c++;
-            }
+    for(size_t iz = nza; iz < nzb; iz++) {
+        for(size_t ix = nxa; ix < nxb; ix++) {
+            sub->vel[c] = model->vel[ix + iz * model->nx];
+            sub->v_min=fmin(sub->v_min, sub->vel[c]);
+            sub->v_max=fmax(sub->v_max, sub->vel[c]);
+            c++;
         }
     }
 
