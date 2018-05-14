@@ -7,8 +7,8 @@ args * arg_parse(int argc, char *argv[], FILE *fd)
     double sample = 0.008;          // Sampling rate to save
     size_t order = 4;               // Simulation order
 
-    size_t nx = 500;                // Model grid size X axis
-    size_t nz = 500;                // Model grid size Z axis
+    size_t nx = 600;                // Model grid size X axis
+    size_t nz = 600;                // Model grid size Z axis
     double dx = 1.;                 // Model cell size X
     double dz = 1.;                 // Model cell size Z
     double vel = 1500.;             // Default constant velocity
