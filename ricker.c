@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "ricker.h"
-#include "globals.h"
 
 ricker_wavelet *ricker__create(double frequency)
 {
@@ -13,6 +12,7 @@ ricker_wavelet *ricker__create(double frequency)
     wavelet->frequency = frequency;
     wavelet->period = ricker__period(frequency);
     wavelet->shift = 0.;
+    wavelet->size = 0;
 
     return wavelet;
 }
@@ -29,18 +29,15 @@ ricker_source *ricker__model(ricker_wavelet *wavelet, size_t x, size_t z, double
 }
 
 
-int ricker__write_to_file(ricker_wavelet *wavelet, const char filename[])
+size_t ricker__write_to_file(const char filename[], ricker_wavelet *wavelet )
 {
     /* Write a ricker wavelet to disk */
     FILE *fp = fopen(filename, "wb");
 
-    if(verbose)
-        fprintf(stderr, "Writing wavelet to %s\n", filename);
-
-    int bytes =fwrite(wavelet->trace, sizeof(wavelet->trace), 1, fp);
+    size_t nelem = fwrite(wavelet->trace, sizeof *wavelet->trace, wavelet->size, fp);
     fclose(fp);
 
-    return bytes;
+    return nelem;
 }
 
 ricker_wavelet * ricker__read_from_file(
@@ -49,33 +46,43 @@ ricker_wavelet * ricker__read_from_file(
         double period, 
         double shift)
 {
-    /* Read a ricker source from a filename */
+    /* Read a ricker source from a filename and check its size*/
     FILE *fp = fopen(filename, "rb");
-    int szbytes = fseek(fp, 0L, SEEK_END);
+    fseek(fp, 0L, SEEK_END);
+    long bytes = ftell(fp);
     rewind(fp);
 
-    ricker_wavelet *wavelet = malloc(sizeof *wavelet + szbytes);
-    fwrite(wavelet->trace, szbytes, 1, fp);
+    // Allocate the wavelet
+    ricker_wavelet *wavelet;
+
+    size_t nelem = bytes / sizeof *wavelet->trace;
+    wavelet = malloc(sizeof *wavelet);
+    wavelet->trace = malloc(nelem * sizeof *wavelet->trace);
+
+    fread(wavelet->trace, sizeof *wavelet->trace, nelem, fp);
     fclose(fp);
 
     wavelet->frequency = frequency;
     wavelet->period = period;
     wavelet->shift = shift;
+    wavelet->size = nelem;
 
     return wavelet;
 }
 
-void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
+size_t ricker__create_trace(ricker_wavelet *wavelet, double time, double dt)
 {
     /* Create the traces to ricker wavelet with shift 's' seconds
      * based on a time 't' and time discretization 'dt' seconds.
      */
 
-    int steps = time / dt + 1;
-    wavelet->trace = malloc(steps * sizeof (double));     // TODO: CHANGE FOR real tupe
+    wavelet->size = time / dt + 1;
+    wavelet->trace = malloc(wavelet->size * sizeof (double));     // TODO: CHANGE FOR real tupe
 
-    for(int i = 0; i < steps; i++)
+    for(size_t i = 0; i < wavelet->size; i++)
         wavelet->trace[i] = ricker__points(i * dt, wavelet->frequency, -wavelet->period);
+
+    return wavelet->size;
 }
 
 

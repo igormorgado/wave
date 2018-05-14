@@ -11,6 +11,7 @@ typedef struct ricker_wavelet
     double frequency;
     double period;
     double shift;
+    size_t size;
     double *trace;
 } ricker_wavelet;
 
@@ -30,11 +31,11 @@ ricker_wavelet *ricker__create(double frequency);
 
 ricker_source  *ricker__model(ricker_wavelet *wavelet, size_t x, size_t z, double delay);
 
-int ricker__write_to_file(ricker_wavelet *wavelet, const char filename[]);
+size_t ricker__write_to_file(const char filename[], ricker_wavelet *wavelet);
 
 ricker_wavelet * ricker__read_from_file(const char filename[], double frequency, double period, double shift);
 
-void ricker__create_trace(ricker_wavelet *wavelet, double time, double dt);
+size_t ricker__create_trace(ricker_wavelet *wavelet, double time, double dt);
 
 void ricker__destroy(ricker_wavelet *wavelet);
 
