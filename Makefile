@@ -4,12 +4,12 @@ CFLAGS = -Wall -g -ggdb
 OBJS = tic ricker utils simulation velocity_model globals wavefield help parse
 UTILS = bfdiff bddiff d2f d2a
 PROGS = wave oldwave
-TESTS = test_tic test_ricker
+TESTS = test_tic test_ricker test_velocity_model test_sub_model
 CC = gcc
 
 SRC=$(wildcard *.c)
 
-all: $(OBJS) $(UTILS) $(PROGS)
+all: $(OBJS) $(UTILS) $(PROGS) $(TESTS)
 
 wave: $(OBJS) 
 	$(CC) -c wave.c $(CFLAGS) 
@@ -34,13 +34,13 @@ globals:
 	$(CC) -c globals.c $(CFLAGS)
 
 ricker:
-	gcc -c ricker.c ${CFLAGS}
+	gcc -c ricker.c $(CFLAGS)
 
 simulation:
-	gcc -c simulation.c ${CFLAGS}
+	gcc -c simulation.c $(CFLAGS)
 
-velocity_model:
-	gcc -c velocity_model.c ${CFLAGS}
+velocity_model: globals
+	gcc -c velocity_model.c ${CFLAGS} $(LIBS)
 
 tic:
 	gcc -c tic.c $(CFLAGS)
@@ -64,6 +64,11 @@ test_tic: tic
 test_ricker: ricker
 	$(CC) -o test_ricker test_ricker.c ricker.o $(CFLAGS) $(LIBS)
 
+test_velocity_model: velocity_model globals
+	$(CC) -o test_velocity_model test_velocity_model.c velocity_model.o globals.o $(CFLAGS) $(LIBS)
+
+test_sub_model: velocity_model globals
+	$(CC) -o test_sub_model test_sub_model.c velocity_model.o globals.o $(CFLAGS) $(LIBS)
 
 ##################################################
 ## UTILS 
