@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
     while((bytesread = fread(bufin, sizeof(double), BUFFER, stdin)))
     {
-        for(int i=0; i<bytesread; i++)
+        for(size_t i=0; i<bytesread; i++)
             fprintf(stdout, "%.15e\n", bufin[i]);
     }
 

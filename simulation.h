@@ -34,7 +34,7 @@ simulation_params * simulation__create();
 
 void simulation__destroy(simulation_params *sp);
 
-double stable_dt(velocity_model *model, ricker_source *source);
+double stable_dt(velocity_model *model);
 
 SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_params *simul);
 

@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     simulation->sample = ap->sample;
 
     /* Create simulation */
-    simulation->dt = stable_dt(model, source);
+    simulation->dt = stable_dt(model);
     simulation->steps = simulation->time / simulation->dt + 1;
     simulation->ntrec = simulation->sample/simulation->dt;
 
@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     wavefield__destroy(P);
     ricker__destroy_source(source);
     velocity_model__destroy(model);
+    free(ap);
 
     /* Finishing */
     if(ticprt) {

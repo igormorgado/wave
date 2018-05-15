@@ -130,7 +130,7 @@ void wavefield__laplacian(wavefield *wave, velocity_model *model, laplacian_para
              *
              ***************************************************************/
             // size_t mid = 125751;
-            // if(verbose && pos == mid)
+            // if(pos == mid)
             // {
             //     int off = (lp->coef_len-1)/2;
             //     //fprintf(stderr, "coeflen %zu off: %d\n", lp->coef_len, off);

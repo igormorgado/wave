@@ -5,7 +5,7 @@
 
 #include "ricker.h"
 
-int main(int argc, char *argv[]) {
+int main(void) {
 
     const char filename[] = "testricker.bin";
     double frequency = 20.0;

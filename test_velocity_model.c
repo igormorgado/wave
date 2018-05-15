@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "velocity_model.h"
 
-int main(int argc, char *argv[]) {
+int main(void) {
 
     const char filename[] = "testmodel.bin";
     size_t nx = 600;

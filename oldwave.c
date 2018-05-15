@@ -55,7 +55,7 @@ double ricker__period(double cnt_freq)
 // **************************************************************************
 // CODES ARE EXACLTY THE SAME TILL HERE
 // **************************************************************************
-int main(int argc, char *argv[])
+int main(void)
 {
     /***************************************************
      *
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
     double dt;                  /* Simulation time step */
 
     // Model Parameters
-    int   nx = 500;             /* Number of X cells / columns */
-    int   nz = 500;             /* Number of Z cells / lines */
+    size_t nx = 500;             /* Number of X cells / columns */
+    size_t nz = 500;             /* Number of Z cells / lines */
     double dx = 1;              /* Size of X grid cell */  
     double dz = 1;              /* Size of Z grid cell */  
     double vel = 1500;          /* Water speed */
@@ -129,13 +129,13 @@ int main(int argc, char *argv[])
 
     // ricker__create_trace()
     double *ricker_wave = malloc(steps * sizeof *ricker_wave);
-    for(int i = 0; i < steps; i++)
+    for(size_t i = 0; i < steps; i++)
         ricker_wave[i] = ricker(i * dt, freq, -period);
 
 
     // wavefield__create()
     double *P1[nz], *P2[nz], *Pt[nz];
-    for(int i = 0; i < nz; i++) {
+    for(size_t i = 0; i < nz; i++) {
         P1[i] = calloc(nx, sizeof (double));
         P2[i] = calloc(nx, sizeof (double));
         Pt[i] = calloc(nx, sizeof (double));
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 
         // simulation__write
         if( it % ntrec == 0) {
-            for(int iz=0; iz<nz; iz++) 
+            for(size_t iz=0; iz<nz; iz++) 
                 fwrite(P1[iz], sizeof(double), nx, stdout);
 
             fprintf(stderr, "Iteration step: %7zu/%7zu  --  ", it, steps);
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
      **************************************************/
     fflush(stdout);
     free(ricker_wave);
-    for(int i = 0; i < nz; i++) {
+    for(size_t i = 0; i < nz; i++) {
         free(P1[i]);
         free(P2[i]);
         free(Pt[i]);
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
     tic();
 
     if(verbose)
-        fprintf(stderr, "xmovie n1=%d n2=%d d1=%lf d2=%lf clip=0.5 loop=2 < \n", nx, nz, dx, dz);
+        fprintf(stderr, "xmovie n1=%zu n2=%zu d1=%lf d2=%lf clip=0.5 loop=2 < \n", nx, nz, dx, dz);
 
     fflush(stderr);
 
