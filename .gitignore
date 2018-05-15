@@ -15,3 +15,8 @@ create_source
 get_dt
 test_domain
 wavempi
+test_domain_comm
+test_ricker
+test_sub_model
+test_tic
+test_velocity_model

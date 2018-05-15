@@ -100,22 +100,17 @@ void decompose_domain(
     
     // Calculates where this subdomain starts based on relative pos
     slice_x0 = relative_pos_x * (nx/number_slices_x);
-    if (nx % number_slices_x) {
-        if(relative_pos_x > (nx % number_slices_x)) {
-            slice_x0 += nx%number_slices_x;
-        } else {
-            slice_x0 += relative_pos_x;
-        }
-    }
+    if(relative_pos_x > (nx % number_slices_x))
+        slice_x0 += nx%number_slices_x;
+    else
+        slice_x0 += relative_pos_x;
 
     slice_z0 = relative_pos_z * (nz/number_slices_z);
-    if (nz % number_slices_z)  {
-        if(relative_pos_z > (nz % number_slices_z)) {
-            slice_z0 += nz%number_slices_z;
-        } else {
-            slice_z0 += relative_pos_z;
-        }
-    }
+    if(relative_pos_z > (nz % number_slices_z))
+        slice_z0 += nz%number_slices_z;
+    else
+        slice_z0 += relative_pos_z;
+
 
     // Verify if source exists
     if(sx > slice_x0 && sx < slice_x0+slice_nx &&

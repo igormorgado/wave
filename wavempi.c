@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
         wavefield__laplacian(P, model, lp);
     //PROCEED WITH CARE
     //     wavefield__perfect_match_layer_by_domain(P, model, lp, domain);
+    // SEND BORDERS TO BROTHERS
         wavefield__swap(P);
     //PROCEED WITH CARE
     //     simulation__write_mpi(it, P, simulation, domain);

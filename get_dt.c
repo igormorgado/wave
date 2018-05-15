@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     double frequency = 20;          // Ricker wavelet frequency
     double v_min = 1500;
     double v_max = 1500;
+    double vel;
     double dt;
 
     int opt = 0;
@@ -73,6 +74,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    vel = v_min;
+    vel = v_max;
     dt = stable_dt_from_param(dx, dz, v_max);
 
     fprintf(stdout, "%lf\n", dt);
