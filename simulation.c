@@ -108,3 +108,4 @@ void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd, 
         
     }
 }
+

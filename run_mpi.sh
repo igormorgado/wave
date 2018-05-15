@@ -29,7 +29,7 @@ order=4
 ./create_source -freq "${freq}" -time "${t}" -dt "${dt}" > "${wavelet}"
 
 
-mpirun -hostfile lamhosts -n 8 \
+mpirun -hostfile lamhosts -n 9 \
 ./wavempi -time "${t}" -dt "${dt}" -sample "${sample}" -order "${order}" \
 		  -nx "${nx}" -nz "${nz}" -dx "${dx}" -dz "${dz}" -vel "${vel}" -model "${velmodel}" \
 		  -freq "${freq}" -sx "${sx}" -sz "${sz}" -source "${wavelet}" 

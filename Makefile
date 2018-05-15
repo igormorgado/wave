@@ -1,15 +1,17 @@
 LIBS = -lm 
-CFLAGS = -Wall -g -ggdb  -Wpedantic -Wextra  -O3
+#CFLAGS = -Wall -g -ggdb  -Wpedantic -Wextra  -O3
+CFLAGS = -O3
 # -pg
-OBJS = tic ricker utils simulation velocity_model globals wavefield help parse domain_comm parsempi
+OBJS = tic ricker utils simulation velocity_model globals wavefield help parse domain_comm parsempi helpmpi simulationmpi wavefieldmpi
 UTILS = bfdiff bddiff d2f d2a create_model
 TESTS = test_tic test_ricker test_velocity_model test_sub_model test_domain_comm
 CC = gcc
 MPICC = mpicc
+PROGS = wave wavempi
 
 SRC=$(wildcard *.c)
 
-all: $(OBJS) $(UTILS) $(PROGS) $(TESTS)
+all: $(OBJS) $(UTILS) $(PROGS) $(TESTS) 
 
 wave: $(OBJS) 
 	$(CC) -c wave.c $(CFLAGS) 
@@ -17,7 +19,7 @@ wave: $(OBJS)
 
 wavempi: $(OBJS) 
 	$(MPICC) -c wavempi.c $(CFLAGS) 
-	$(MPICC) -o wavempi wavempi.o help.o wavefield.o globals.o ricker.o tic.o simulation.o velocity_model.o parsempi.o domain_comm.o $(CFLAGS) $(LIBS)
+	$(MPICC) -o wavempi wavempi.o wavefield.o  wavefieldmpi.o globals.o ricker.o tic.o simulation.o simulationmpi.o velocity_model.o helpmpi.o parsempi.o domain_comm.o $(CFLAGS) $(LIBS)
 
 tests: $(TESTS)
 
@@ -37,6 +39,9 @@ parsempi:
 help:
 	gcc -c help.c $(CFLAGS)
 
+helpmpi:
+	gcc -c helpmpi.c $(CFLAGS)
+
 globals:
 	$(CC) -c globals.c $(CFLAGS)
 
@@ -45,6 +50,9 @@ ricker:
 
 simulation: 
 	gcc -c simulation.c $(CFLAGS)
+
+simulationmpi: 
+	$(MPICC) -c simulationmpi.c $(CFLAGS)
 
 velocity_model: globals
 	gcc -c velocity_model.c ${CFLAGS}
@@ -57,6 +65,9 @@ utils:
 
 wavefield:
 	gcc -c wavefield.c $(CFLAGS)
+
+wavefieldmpi:
+	$(MPICC) -c wavefieldmpi.c $(CFLAGS)
 
 domain_comm:
 	gcc -c domain_comm.c $(CFLAGS)

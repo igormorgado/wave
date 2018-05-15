@@ -6,7 +6,7 @@ args * arg_parse(int argc, char *argv[])
     double time = .25;              // Simulation time
     double sample = 0.008;          // Sampling rate to save
     size_t order = 4;               // Simulation order
-    double dt = 0.008;
+    double dt = 0.0001333333333;
 
     size_t nx = 600;                // Model grid size X axis
     size_t nz = 600;                // Model grid size Z axis
@@ -31,8 +31,8 @@ args * arg_parse(int argc, char *argv[])
     int long_index = 0;
 
     static  struct option long_options[] = {
-        {"time",    required_argument,  0,  'T'},   // simumation time in seconds
-        {"dt",      required_argument,  0,  't'},   // Size of grid in Y dir
+        {"time",    required_argument,  0,  't'},   // simumation time in seconds
+        {"dt",      required_argument,  0,  'k'},   // Size of grid in Y dir
         {"sample",  required_argument,  0,  'd'},   // Wave simulation sampling
         {"order",   required_argument,  0,  'o'},   // Simulation order
         {"nx",      required_argument,  0,  'x'},   // number of cells in X dir
@@ -51,12 +51,12 @@ args * arg_parse(int argc, char *argv[])
         {0,         0,                  0,  0  }
     };
 
-    while ((opt = getopt_long_only(argc, argv, "T:t:d:o:x:z:s:a:v:m:f:w:q:n:Vih", long_options, &long_index)) != -1)
+    while ((opt = getopt_long_only(argc, argv, "t:k:d:o:x:z:s:a:v:m:f:w:q:n:Vih", long_options, &long_index)) != -1)
     {
         switch(opt) {
-            case 'T':
-                time = atof(optarg); break;
             case 't':
+                time = atof(optarg); break;
+            case 'k':
                 dt = atof(optarg); break;
             case 'd':
                 sample = atof(optarg); break;
@@ -118,7 +118,7 @@ args * arg_parse(int argc, char *argv[])
     args *ap = malloc(sizeof *ap);
 
     ap->time = time;
-    ap->time = dt;
+    ap->dt = dt;
     ap->sample = sample;
     ap->order = order;
     ap->nx = nx;

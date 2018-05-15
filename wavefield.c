@@ -191,6 +191,7 @@ void wavefield__perfect_match_layer(wavefield *wave, velocity_model *model, lapl
 
 }
 
+
 void wavefield__swap(wavefield *wave)
 {
     double *tmp;

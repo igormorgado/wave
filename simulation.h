@@ -13,6 +13,7 @@
 #include "ricker.h"
 #include "velocity_model.h"
 #include "wavefield.h"
+#include "domain_comm.h"
 
 typedef uint8_t SIMUL_STATUS;
 
@@ -43,6 +44,7 @@ SIMUL_STATUS isstable(ricker_source *source, velocity_model *model, simulation_p
 void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s, simulation_params *simul, size_t it);
 
 void simulation__write(size_t it, wavefield *w, simulation_params *s, FILE *fd, int ticprt);
+void simulation__write_mpi(size_t it, wavefield *w, simulation_params *s, domain_info *d, int ticprt);
 
 
 #endif

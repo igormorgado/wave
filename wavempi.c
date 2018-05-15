@@ -13,7 +13,9 @@
 #include "velocity_model.h"
 #include "ricker.h"
 #include "wavefield.h"
+#include "wavefieldmpi.h"
 #include "simulation.h"
+#include "simulationmpi.h"
 #include "domain_comm.h"
 
 
@@ -28,15 +30,14 @@ int main(int argc, char *argv[])
        fprintf(stderr, "Unstable model\n");
        exit(EXIT_FAILURE);
     }
-    
 
     /* Create simulation */
     simulation_params *simulation = simulation__create();
     simulation->time = ap->time;
     simulation->sample = ap->sample;
+    simulation->dt = ap->dt;
     simulation->steps = simulation->time / simulation->dt + 1;
     simulation->ntrec = simulation->sample/simulation->dt;
-
 
     /* Pre calculate  Laplacian parameters */
     laplacian_params *lp = wavefield__laplacian_params_(ap->dx, ap->dz, ap->order, simulation->dt);
@@ -46,19 +47,21 @@ int main(int argc, char *argv[])
      * MPI Stuff
      *
      ***************************************************/
-    MPI_Init(NULL,NULL);
+
+    MPI_Init(&argc,&argv);
     int world_size;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    if (world_rank == 0 && world_size % 4 != 0) {
-        fprintf(stderr, "Right now only multiples of 4 workers are supported\n");
+    size_t number_slices_x = 3;
+    size_t number_slices_z = world_size/number_slices_x;
+
+    if (world_rank == 0 && world_size % number_slices_x != 0) {
+        fprintf(stderr, "Right now only multiples of 3 workers are supported\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    size_t number_slices_x = 4;
-    size_t number_slices_z = world_size/4;
 
     domain_info *domain = malloc(sizeof *domain);
     decompose_domain(world_size, world_rank,
@@ -93,12 +96,10 @@ int main(int argc, char *argv[])
             simulation__inject_source(P, model, ricker, simulation, it);
 
         wavefield__laplacian(P, model, lp);
-    //PROCEED WITH CARE
-    //     wavefield__perfect_match_layer_by_domain(P, model, lp, domain);
-    // SEND BORDERS TO BROTHERS
+        wavefieldmpi__perfect_match_layer_by_domain(P, model, lp, domain);
+        wavefieldmpi__share_border_by_domain(P, lp, domain);
         wavefield__swap(P);
-    //PROCEED WITH CARE
-    //     simulation__write_mpi(it, P, simulation, domain);
+        simulationmpi__write(it, P, simulation, domain, ticprt);
     }
 
     /* Memory  cleanup */
@@ -117,12 +118,11 @@ int main(int argc, char *argv[])
     simulation__destroy(simulation);
     free(ap);
 
-    // proceed with care
-    // simulation__merge_wavefields();
+    // TODO: THIS
+    simulationmpi__merge_wavefields(domain);
     
     /* Finishing */
     if(ticprt) {
-        fprintf(stderr, "TOTAL ");
         tic();
     }
 
