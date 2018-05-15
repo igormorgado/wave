@@ -39,6 +39,7 @@ void wavefield__laplacian(wavefield *w, velocity_model *m, laplacian_params *lp)
 
 void wavefield__swap(wavefield *wave);
 
+laplacian_params * wavefield__laplacian_params_(double dx, double dz, size_t order, double dt);
 laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, double dt);
 
 void wavefield__perfect_match_layer(wavefield *wave, velocity_model *model, laplacian_params *lp);

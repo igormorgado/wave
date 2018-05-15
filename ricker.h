@@ -33,7 +33,7 @@ ricker_source  *ricker__model(ricker_wavelet *wavelet, size_t x, size_t z, doubl
 
 size_t ricker__write_to_file(const char filename[], ricker_wavelet *wavelet);
 
-ricker_wavelet * ricker__read_from_file(const char filename[], double frequency, double period, double shift);
+ricker_wavelet * ricker__read_from_file(const char filename[], double frequency, double shift);
 
 size_t ricker__create_trace(ricker_wavelet *wavelet, double time, double dt);
 

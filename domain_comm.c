@@ -10,6 +10,8 @@ void decompose_domain(
         size_t stencil_size_z,
         size_t nx,
         size_t nz,
+        size_t sx,
+        size_t sz,
         domain_info *domain)
 { 
     // These are relative position of subgrid in the whole grid
@@ -23,6 +25,10 @@ void decompose_domain(
     // vertical:    TOP, BOTTOM, MIDDLE
     int horizontal_position;
     int vertical_position;
+
+    int has_source = 0;
+    size_t lsx = 0;
+    size_t lsz = 0;
 
     /*
     // These are the final coordinates of subgrid already with the ghost areas
@@ -80,6 +86,10 @@ void decompose_domain(
     int left_rank = -1;
     int right_rank = -1;
 
+    // Size of domain in X and Z direction after apply all ghost borders
+    size_t lnx;
+    size_t lnz;
+
 
     relative_pos_x = world_rank % number_slices_x;
     relative_pos_z = world_rank / number_slices_x;
@@ -90,25 +100,35 @@ void decompose_domain(
     
     // Calculates where this subdomain starts based on relative pos
     slice_x0 = relative_pos_x * (nx/number_slices_x);
-    if (nx % number_slices_x) 
-        if(relative_pos_x > (nx % number_slices_x))
+    if (nx % number_slices_x) {
+        if(relative_pos_x > (nx % number_slices_x)) {
             slice_x0 += nx%number_slices_x;
-        else
+        } else {
             slice_x0 += relative_pos_x;
+        }
+    }
 
     slice_z0 = relative_pos_z * (nz/number_slices_z);
-    if (nz % number_slices_z) 
-        if(relative_pos_z > (nz % number_slices_z))
+    if (nz % number_slices_z)  {
+        if(relative_pos_z > (nz % number_slices_z)) {
             slice_z0 += nz%number_slices_z;
-        else
+        } else {
             slice_z0 += relative_pos_z;
+        }
+    }
 
+    // Verify if source exists
+    if(sx > slice_x0 && sx < slice_x0+slice_nx &&
+       sz > slice_z0 && sz < slice_z0+slice_nz)  {
+        has_source = 1;
+        lsx = sx - slice_x0;
+        lsz = sz - slice_z0;
+    }
     
     // Now based on stencil size and location find the exact coordinates
     // of polygon to start and stop the creation of the subdomain
     nxa = slice_x0;
     nxb = slice_x0 + slice_nx;
-
     nza = slice_z0;
     nzb = slice_z0 + slice_nz;
 
@@ -124,12 +144,16 @@ void decompose_domain(
         horizontal_position = RIGHT;
         left_rank = world_rank - 1;
         nxa -= stencil_size_x;
+        if(has_source)
+            lsx += stencil_size_x;
     } else {
         horizontal_position = MIDDLE;
         right_rank = world_rank + 1;
         left_rank = world_rank - 1;
         nxa -= stencil_size_x;
         nxb += stencil_size_x;
+        if(has_source)
+            lsx += stencil_size_x;
     }
 
     if(relative_pos_z == 0) {
@@ -140,13 +164,21 @@ void decompose_domain(
         upper_rank = world_rank - number_slices_x;
         vertical_position = BOTTOM;
         nza -= stencil_size_z;
+        if(has_source)
+            lsz += stencil_size_z;
     } else {
         vertical_position = MIDDLE;
         upper_rank = world_rank - number_slices_x;
         lower_rank = world_rank + number_slices_x;
         nza -= stencil_size_z;
         nzb += stencil_size_z;
+        if(has_source)
+            lsz += stencil_size_z;
     }
+
+    lnx = nxb - nxa;
+    lnz = nzb - nza;
+
 
     // Fill the datastructure
     domain->world_size = world_size;
@@ -173,7 +205,13 @@ void decompose_domain(
     domain->lower_rank = lower_rank;
     domain->left_rank = left_rank;
     domain->right_rank = right_rank;
-    // THIS IS DAMN UGLY BUT WILL WORK FOR NOW!!!!
+    domain->sx = sx;
+    domain->sz = sz;
+    domain->has_source = has_source;
+    domain->lsx = lsx;
+    domain->lsz = lsz;
+    domain->lnx = lnx;
+    domain->lnz = lnz;
 }
 
 

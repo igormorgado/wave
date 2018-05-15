@@ -43,7 +43,6 @@ size_t ricker__write_to_file(const char filename[], ricker_wavelet *wavelet )
 ricker_wavelet * ricker__read_from_file(
         const char filename[], 
         double frequency, 
-        double period, 
         double shift)
 {
     /* Read a ricker source from a filename and check its size*/
@@ -63,7 +62,7 @@ ricker_wavelet * ricker__read_from_file(
     fclose(fp);
 
     wavelet->frequency = frequency;
-    wavelet->period = period;
+    wavelet->period = ricker__period(frequency);
     wavelet->shift = shift;
     wavelet->size = nelem;
 

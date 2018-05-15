@@ -26,12 +26,19 @@ typedef struct domain_info {
     size_t slice_x0;
     size_t slice_nx;
     size_t slice_nz;
+    size_t lnx;
+    size_t lnz;
     int horizontal_position;
     int vertical_position;
     int upper_rank;
     int lower_rank;
     int left_rank;
     int right_rank;
+    int has_source;
+    size_t sx;
+    size_t sz;
+    size_t lsx;
+    size_t lsz;
 } domain_info;
 
 void decompose_domain(
@@ -39,5 +46,6 @@ void decompose_domain(
         size_t number_slices_x, size_t number_slices_z, 
         size_t stencil_size_x, size_t stencil_size_z,
         size_t nx, size_t nz,
+        size_t sx, size_t sz,
         domain_info *domain);
 #endif

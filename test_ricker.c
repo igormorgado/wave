@@ -46,7 +46,7 @@ int main(void) {
             nelem, wavelet->size);
 
     fprintf(stderr, "\nReading wavelet from file %s.\n", filename);
-    ricker_wavelet *wavelet2 = ricker__read_from_file(filename, frequency, wavelet->period, 0);
+    ricker_wavelet *wavelet2 = ricker__read_from_file(filename, frequency, 0);
 
     fprintf(stderr, "\nRead Ricker wavelet information and data\n");
     fprintf(stderr,   "========================================\n");

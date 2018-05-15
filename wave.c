@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         wavefield__laplacian(P, model, lp);
         wavefield__perfect_match_layer(P, model, lp);
         wavefield__swap(P);
-        simulation__write(it, P, simulation, stdout);
+        simulation__write(it, P, simulation, stdout, ticprt);
     }
 
     /* Memory  cleanup */

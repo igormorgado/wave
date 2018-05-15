@@ -20,8 +20,7 @@ void wavefield__destroy(wavefield *w)
     free(w);
 }
 
-
-laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, double dt)
+laplacian_params * wavefield__laplacian_params_(double dx, double dz, size_t order, double dt) 
 {
     laplacian_params * lp = malloc(sizeof (laplacian_params));
 
@@ -64,10 +63,10 @@ laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, 
     lp->border_size = lp->coef_len - 1;      // Size of border depends on stencil
 
     lp->dt = dt;
-    lp->dt_dx = lp->dt/m->dx;
-    lp->dt_dz = lp->dt/m->dz;
-    lp->dxdx = m->dx * m->dx;               // Change in x squared
-    lp->dzdz = m->dz * m->dz;               // Change in z squared
+    lp->dt_dx = lp->dt/dx;
+    lp->dt_dz = lp->dt/dz;
+    lp->dxdx = dx * dx;               // Change in x squared
+    lp->dzdz = dz * dz;               // Change in z squared
     
     lp->coef_dx2 = malloc(lp->coef_len * sizeof(double));
     lp->coef_dz2 = malloc(lp->coef_len * sizeof(double));
@@ -78,6 +77,11 @@ laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, 
     return lp;
 }
 
+laplacian_params * wavefield__laplacian_params(velocity_model *m, size_t order, double dt)
+{
+    return wavefield__laplacian_params_(m->dx, m->dz, order, dt);
+}
+
 void wavefield__destroy_laplacian_params(laplacian_params *lp)
 {
     free(lp->coef_dx2);
@@ -85,6 +89,7 @@ void wavefield__destroy_laplacian_params(laplacian_params *lp)
     free(lp->coef);
     free(lp);
 }
+
 
 void wavefield__laplacian(wavefield *wave, velocity_model *model, laplacian_params *lp)
 {
