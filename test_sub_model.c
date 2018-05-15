@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "velocity_model.h"
 
-int main(int argc, char *argv[]) {
+int main(void) {
 
     const char filename[] = "testmodel.bin";
     size_t nx = 30;
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
 
     fprintf(stderr, "\nReading sub velocity model from file %s.\n", filename);
-    velocity_model *sub = velocity_model__read_sub_from_file(filename, nx, nz, dx, dz, nxa, nza, nxb, nzb);
+    velocity_model *sub = velocity_model__create_submodel_from_file(filename, nx, nz, dx, dz, nxa, nza, nxb, nzb);
 
     fprintf(stderr, "\nRead Velocity wavelet information and data\n");
     fprintf(stderr,   "========================================\n");

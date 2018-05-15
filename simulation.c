@@ -17,7 +17,7 @@ void simulation__destroy(simulation_params *sp)
 }
 
 
-double stable_dt(velocity_model *model, ricker_source *source) 
+double stable_dt(velocity_model *model) 
 {
     /* Returns a stable dT based in velocity model parameters */
 
@@ -76,10 +76,6 @@ void simulation__inject_source(wavefield *w, velocity_model *m, ricker_source *s
     double vel_dt2 = powf(m->vel[pos] * simul->dt, 2); 
 
     w->grid[pos] += vel_dt2 * s->wavelet->trace[it];
-
-    // DEBUG
-    // if(verbose)
-    //     fprintf(stderr, "%010zu injected @ [%zu,%zu] (pos)%zu %lf\n", it, s->x, s->z, pos, s->wavelet->trace[it]);
 }
 
 

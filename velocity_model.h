@@ -5,9 +5,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "globals.h"
-
-
 typedef struct velocity_model 
 {
     size_t  nx;                 /* Number of X cells / columns */
@@ -19,13 +16,16 @@ typedef struct velocity_model
     double  *vel;              /* Velocity model flatenned array */
 } velocity_model;
 
+
 velocity_model * velocity_model__create(size_t nx, size_t nz, double dx, double dz);
 void             velocity_model__destroy(velocity_model *model);
+
 
 velocity_model * velocity_model__read_from_file( const char filename[], size_t nx, size_t nz, double dx, double dz);
 size_t           velocity_model__write_to_file(const char filename[], velocity_model *model);
 
-velocity_model *velocity_model__read_sub_from_file(
+velocity_model *velocity_model__create_submodel(velocity_model *model, size_t nxa, size_t nza, size_t nxb, size_t nzb);
+velocity_model *velocity_model__create_submodel_from_file(
                                         const char filename[],
                                         size_t nx,
                                         size_t nz,

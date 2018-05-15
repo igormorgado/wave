@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     {
         bytes_read = imin(bytes_read_buf, bytes_read_stdin);
 
-        for(int i=0; i<bytes_read; i++)
+        for(size_t i=0; i<bytes_read; i++)
             bufout[i] = bufin[i] - buf[i];
 
         fwrite(bufout, sizeof(float), bytes_read, stdout);

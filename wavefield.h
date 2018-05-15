@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #include "utils.h"
-#include "globals.h"
 #include "velocity_model.h"
 
 // cfd: Central Finite Difference

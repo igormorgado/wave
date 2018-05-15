@@ -1,5 +1,5 @@
 LIBS = -lm 
-CFLAGS = -Wall -g -ggdb 
+CFLAGS = -Wall -g -ggdb  -Wpedantic -Wextra
 # -pg
 OBJS = tic ricker utils simulation velocity_model globals wavefield help parse
 UTILS = bfdiff bddiff d2f d2a
