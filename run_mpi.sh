@@ -1,7 +1,7 @@
 #!/bin/bash
 
 make clean
-make create_model create_source get_dt wavempi
+make create_model create_source get_dt wavempi  d2f d2a
 
 # VMODEL PARAMS
 nx=600
@@ -16,11 +16,11 @@ velmodel="const.bin"
 # Source params
 freq=20
 wavelet="ricker20.bin"
-sx=1
-sz=1
+sx=50
+sz=50
 
 # Simulation params
-t=2
+t=1
 dt=$(./get_dt -dx "${dx}" -dz "${dz}" -vmax "${vmax}" -vmin "${vmin}" -freq "${freq}")
 sample=0.008
 order=4
@@ -29,10 +29,10 @@ order=4
 ./create_source -freq "${freq}" -time "${t}" -dt "${dt}" > "${wavelet}"
 
 
-mpirun -hostfile lamhosts -n 9 \
+mpirun -hostfile lamhosts -n 6 \
 ./wavempi -time "${t}" -dt "${dt}" -sample "${sample}" -order "${order}" \
 		  -nx "${nx}" -nz "${nz}" -dx "${dx}" -dz "${dz}" -vel "${vel}" -model "${velmodel}" \
-		  -freq "${freq}" -sx "${sx}" -sz "${sz}" -source "${wavelet}" 
+		  -freq "${freq}" -sx "${sx}" -sz "${sz}" -source "${wavelet}"  -verbose
 
 
 

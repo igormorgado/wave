@@ -151,4 +151,6 @@ void wavefieldmpi__share_border_by_domain(wavefield *wave, laplacian_params *lp,
             }
         }
     }
+
+    free(buf);
 }
