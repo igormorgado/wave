@@ -14,9 +14,9 @@ void simulationmpi__write(size_t it, wavefield *w, simulation_params *s, domain_
 
     if( it % s->ntrec == 0)  {
         sprintf(filename, "wavefield.%04d.bin", d->world_rank);
-        fp = fopen(filename, "wb+");
+        fp = fopen(filename, "ab+");
         fwrite(w->grid, sizeof(double), w->nx * w->nz, fp);
-        //fprintf(stderr, "(%d) Saving iteration %7zu/%zu to %s\n", d->world_rank, it, s->steps, filename);
+        fflush(fp);
         fclose(fp);
         if(ticprt) {
             fprintf(stderr, "(%2d) Iteration step: %7zu/%7zu -- ", d->world_rank, it, s->steps);
