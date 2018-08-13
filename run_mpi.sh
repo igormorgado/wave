@@ -1,7 +1,7 @@
 #!/bin/bash
 
 make clean
-make create_model create_source get_dt wavempi  d2f d2a
+make create_model create_source get_dt wavempi  d2f d2a wave
 
 # VMODEL PARAMS
 nx=600
@@ -29,7 +29,11 @@ order=4
 ./create_source -freq "${freq}" -time "${t}" -dt "${dt}" > "${wavelet}"
 
 
-mpirun -hostfile lamhosts -n 6 \
+#./wave  -time "${t}" -sample "${sample}" -order "${order}" \
+#		  -nx "${nx}" -nz "${nz}" -dx "${dx}" -dz "${dz}" -vel "${vel}" \
+#		  -freq "${freq}" -sx "${sx}" -sz "${sz}" -verbose > w2.bin
+#
+mpirun -hostfile lamhosts -n 4 \
 ./wavempi -time "${t}" -dt "${dt}" -sample "${sample}" -order "${order}" \
 		  -nx "${nx}" -nz "${nz}" -dx "${dx}" -dz "${dz}" -vel "${vel}" -model "${velmodel}" \
 		  -freq "${freq}" -sx "${sx}" -sz "${sz}" -source "${wavelet}"  -verbose

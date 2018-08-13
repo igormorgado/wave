@@ -54,11 +54,11 @@ int main(int argc, char *argv[])
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    size_t number_slices_x = 3;
+    size_t number_slices_x = 2;
     size_t number_slices_z = world_size/number_slices_x;
 
     if (world_rank == 0 && world_size % number_slices_x != 0) {
-        fprintf(stderr, "Right now only multiples of 3 workers are supported\n");
+        fprintf(stderr, "Right now only multiples of 2 workers are supported\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
